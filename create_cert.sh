@@ -1,6 +1,6 @@
 #!/bin/bash
 
-openssl req -newkey rsa:4096 -nodes -sha256 -keyout certs/domain.key -x509 -days 365 -out certs/domain.crt -addext subjectAltName="IP:10.0.2.15" # experimentar, em vez do IP meter um DNS
+openssl req -newkey rsa:4096 -nodes -sha256 -keyout certs/domain.key -x509 -days 365 -out certs/domain.crt -addext subjectAltName="IP:localhost" # experimentar, em vez do IP meter um DNS
 
 mkdir -p /etc/docker/certs.d/10.0.2.15
 cp certs/domain.crt /etc/docker/certs.d/10.0.2.15/ca.crt
