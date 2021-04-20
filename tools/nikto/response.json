@@ -1,0 +1,12 @@
+- Nikto v2.1.6
+---------------------------------------------------------------------------
++ Target IP:          74.50.111.244
++ Target Hostname:    hack.me
++ Target Port:        80
++ Start Time:         2021-04-20 15:12:11 (GMT0)
+---------------------------------------------------------------------------
++ Server: Microsoft-IIS/7.5
++ Retrieved x-powered-by header: Hack.me Team
++ The X-Content-Type-Options header is not set. This could allow the user agent to render the content of the site in a different fashion to the MIME type.
++ Root page / redirects to: https://hack.me/
++ No CGI Directories found (use '-C all' to force check all possible dirs)

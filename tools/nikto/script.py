@@ -1,7 +1,8 @@
-import os 
+import os
+import subprocess
 
-os.system("export TARGET=http://hack.me")
+os.environ['TARGET'] = 'http://hack.me'
 
-os.system("docker build -t teste .")
+os.system("docker pull localhost/nikto:v1")
 
-os.system("docker run teste -host $TARGET")
+os.system("docker run --user \"$(id -u):$(id -g)\" localhost/nikto:v1 -h $TARGET -o out.json")
