@@ -5,7 +5,7 @@ openssl req -newkey rsa:4096 -nodes -sha256 -keyout certs/domain.key -x509 -days
 mkdir -p /etc/docker/certs.d/10.0.2.15
 cp certs/domain.crt /etc/docker/certs.d/10.0.2.15/ca.crt
 
-#docker rm -f registry
+docker rm -f registry
 
 docker run -d --restart=always --name registry -v "$(pwd)"/certs:/certs \
         -e REGISTRY_HTTP_ADDR=0.0.0.0:443 \
