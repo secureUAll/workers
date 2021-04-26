@@ -6,7 +6,7 @@ def main(domain, out):
     print(domain)
     print(out)
     os.system("docker pull localhost/nmap:v1")
-    os.system("docker  run --user \"$(id -u):$(id -g)\" -v `pwd`:`pwd` -w `pwd` -i -t localhost/nmap:v1 pwd " + domain + " -oN " + out)
+    os.system("docker  run --user \"$(id -u):$(id -g)\" -v `pwd`:`pwd` -w `pwd` -i -t localhost/nmap:v1 " + domain + " -oX " + out)
 
 if __name__ == "__main__":
 
