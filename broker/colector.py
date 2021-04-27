@@ -14,12 +14,12 @@ import time
 
 logging.basicConfig(level=logging.DEBUG)
 
-producer = KafkaProducer(bootstrap_servers='172.21.0.3:29092',
-                          #security_protocol='SSL',
-                          #ssl_cafile='./worker_certs/CARoot.pem',
-                          #ssl_certfile='./worker_certs/certificate.pem',
-                          #ssl_keyfile='./worker_certs/key.pem',
-                          #ssl_check_hostname=False,
+producer = KafkaProducer(bootstrap_servers='10.139.3.2:29092',
+                          security_protocol='SSL',
+                          ssl_cafile='./worker_certs/CARoot.pem',
+                          ssl_certfile='./worker_certs/certificate.pem',
+                          ssl_keyfile='./worker_certs/key.pem',
+                          ssl_check_hostname=False,
                           api_version=(2,7,0))
 
 # Write hello world to test topic
