@@ -12,9 +12,9 @@ import time
 
 #time.sleep(10)
 
-logging.basicConfig(level=logging.DEBUG)
+#logging.basicConfig(level=logging.DEBUG)
 
-producer = KafkaProducer(bootstrap_servers='10.139.3.2:29092',
+producer = KafkaProducer(bootstrap_servers='172.21.0.2:29092',
                           security_protocol='SSL',
                           ssl_cafile='./worker_certs/CARoot.pem',
                           ssl_certfile='./worker_certs/certificate.pem',
@@ -23,7 +23,7 @@ producer = KafkaProducer(bootstrap_servers='10.139.3.2:29092',
                           api_version=(2,7,0))
 
 # Write hello world to test topic
-p=producer.send('testinho workers', b'Hello World')
+p=producer.send('test', b'Hello World')
 producer.flush()
 print(p)
 #consumer = KafkaConsumer('test',bootstrap_servers='kafka:9092',
