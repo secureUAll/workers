@@ -4,7 +4,6 @@ import argparse
 
 def main(domain, out, filename):
     os.system("docker pull localhost/zap:v1")
-    print("docker  run --user \"$(id -u):$(id -g)\" -v `pwd`:`pwd` -w `pwd` -i -t localhost/zap:v1 " + filename + " -t " + domain + " -J " + out)
     os.system("docker  run --user \"$(id -u):$(id -g)\" -v $(pwd):/zap/wrk/:rw --rm -t localhost/zap:v1 " + filename + " -t " + domain + " -J " + out)
     # usage ex: docker run --user $(id -u):$(id -g) -v $(pwd):/zap/wrk/:rw --rm -t owasp/zap2docker-stable zap-baseline.py -t https://hack.me/ -J out.json
 
