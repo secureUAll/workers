@@ -5,12 +5,8 @@ services:
         build: ./broker
         container_name: broker
         restart: always
-        networks:
-            - colector_some-net
 
 networks:
     default:
         external:
             name: rede
-    colector_some-net:
-        external: true
