@@ -51,7 +51,18 @@ logging.warning(consumer.subscription())
 
 #init message 
 random = os.urandom(16)
-message = {'CONFIG':{'ADDRESS_LIST':['123.4.4.4','123.3.3.3']}}
+
+# Read file with default domains
+domains = []
+with open("domains.txt", "r") as f:
+    # by line
+    for line in f:
+        # add domain to list
+        line = line.strip('\n')
+        domains.append(line)
+
+# message with domains
+message = {'CONFIG':{'ADDRESS_LIST':domains}}
 
 # Send address list
 producer.send(colector_topics[0], key=random , value=message)
@@ -63,7 +74,7 @@ for message in consumer:
     if message.topic == "INIT":
         # Get ID
         if message.key == random:
-            WORKER_ID = message.value["WORKER_ID"]
+            WORKER_ID = message.value['WORKER_ID']
 
     else:
         if message.key == WORKER_ID:
