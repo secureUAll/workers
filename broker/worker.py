@@ -8,6 +8,7 @@ import time
 
 
 #time.sleep(30)
+time.sleep(22)
 colector_topics=['INIT','SCAN_REQUEST']
 
 WORKER_ID = 0
