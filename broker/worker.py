@@ -7,7 +7,7 @@ import logging
 import time
 
 
-time.sleep(30)
+#time.sleep(30)
 colector_topics=['INIT','SCAN_REQUEST']
 
 WORKER_ID = 0
@@ -47,11 +47,13 @@ consumer.subscribe(colector_topics)
 
 logging.warning("worker")
 logging.warning(consumer.subscription())
+print("1")
 
 
 #init message 
 random = os.urandom(16)
 
+print("2")
 # Read file with default domains
 domains = []
 with open("domains.txt", "r") as f:
@@ -61,23 +63,29 @@ with open("domains.txt", "r") as f:
         line = line.strip('\n')
         domains.append(line)
 
+print("3")
+
 # message with domains
 message = {'CONFIG':{'ADDRESS_LIST':domains}}
 
+print("hello1")
 # Send address list
 producer.send(colector_topics[0], key=random , value=message)
 producer.flush()
 
-
+print("hello")
 for message in consumer:
+    print(message)
     
     if message.topic == "INIT":
         # Get ID
-        if message.key == random:
-            WORKER_ID = message.value['WORKER_ID']
+        print(message)
+        #if message.key == random:
+            #WORKER_ID = message.value['WORKER_ID']
 
     else:
         if message.key == WORKER_ID:
+            machine = message.value["MACHINE"]
             if message.value["SCRAP_LEVEL"] == 2:
                 continue
             elif message.value["SCRAP_LEVEL"] == 3:
