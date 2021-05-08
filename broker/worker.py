@@ -6,6 +6,11 @@ import json
 import logging
 import time
 
+import subprocess
+import argparse
+import json
+import xmltodict
+
 
 #time.sleep(30)
 time.sleep(22)
@@ -48,13 +53,11 @@ consumer.subscribe(colector_topics)
 
 logging.warning("worker")
 logging.warning(consumer.subscription())
-print("1")
 
 
 #init message 
 random = os.urandom(16)
 
-print("2")
 # Read file with default domains
 domains = []
 with open("domains.txt", "r") as f:
@@ -64,42 +67,56 @@ with open("domains.txt", "r") as f:
         line = line.strip('\n')
         domains.append(line)
 
-print("3")
 
 # message with domains
 message = {'CONFIG':{'ADDRESS_LIST':domains}}
 
-print("hello1")
 # Send address list
 producer.send(colector_topics[0], key=random , value=message)
 producer.flush()
 
-print("hello")
 for message in consumer:
-    print(message)
     
+    # initial message response to save WORKER_ID
     if message.topic == "INIT":
         # Get ID
-        print(message)
-        #if message.key == random:
-            #WORKER_ID = message.value['WORKER_ID']
+        if message.key == random and "WORKER_ID" in message.value:
+            WORKER_ID = message.value['WORKER_ID']
 
     else:
         if message.key == WORKER_ID:
+            # get machine to scan
             machine = message.value["MACHINE"]
+
+            # default scrapping value
             if message.value["SCRAP_LEVEL"] == 2:
-                continue
+                # pull image from registry
+                os.system("docker pull localhost/vulscan:latest")
+                # runn image
+                os.system("docker  run --user \"$(id -u):$(id -g)\" -v `pwd`:`pwd` -w `pwd` -i -t localhost/vulscan:latest -sV --script=vulscan/vulscan.nse " + machine + " -oX out.xml")
+
+                output_json = convert_to_json("out.xml")
+
             elif message.value["SCRAP_LEVEL"] == 3:
                 continue
             elif message.value["SCRAP_LEVEL"] == 4:
                 continue
             
-            producer.send(colector_topics[1], key=WORKER_ID, value=message)
+            producer.send(colector_topics[1], key=WORKER_ID, value=output_json)
             producer.flush()
     
 #logging.warning(message.topic)
 #logging.warning(message.value)
 
+def convert_to_json(output_file):
+
+    f = open(output_file)
+    xml_content = f.read()
+    f.close()
+
+    #write_file = open("out_json.json", "w")
+    #write_file.write(json.dumps(xmltodict.parse(xml_content), indent=4, sort_keys=True))
+    return json.dumps(xmltodict.parse(xml_content), indent=4, sort_keys=True)
     
 
 
