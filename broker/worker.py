@@ -81,12 +81,14 @@ for message in consumer:
     if message.topic == "INIT":
         # Get ID
         if message.key == random and "WORKER_ID" in message.value:
-            print(message.value)
+            logging.warning(message.value)
             WORKER_ID = message.value['WORKER_ID']
 
     elif message.topic== colector_topics[1]:
+        logging.warning(message.key)
+        logging.warning(WORKER_ID)
         if message.key == WORKER_ID:
-            print(message.value)
+            logging.warning(message.value)
             # get machine to scan
             machine = message.value["MACHINE"]
 
@@ -104,7 +106,7 @@ for message in consumer:
             elif message.value["SCRAP_LEVEL"] == 4:
                 continue
             
-            print("vai mandar")
+            logging.warning("vai mandar")
             producer.send(colector_topics[2], key=WORKER_ID, value=output_json)
             producer.flush()
     
