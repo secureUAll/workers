@@ -85,9 +85,9 @@ for message in consumer:
             WORKER_ID = message.value['WORKER_ID']
 
     elif message.topic== colector_topics[1]:
-        logging.warning(message.key)
+        logging.warning(int.from_bytes(message.key,"big"))
         logging.warning(WORKER_ID)
-        if message.key == WORKER_ID:
+        if int.from_bytes(message.key,"big") == WORKER_ID:
             logging.warning(message.value)
             # get machine to scan
             machine = message.value["MACHINE"]
