@@ -14,7 +14,7 @@ import xmltodict
 
 #time.sleep(30)
 time.sleep(22)
-colector_topics=['INIT','SCAN_REQUEST']
+colector_topics=['INIT','SCAN_REQUEST','LOG']
 
 WORKER_ID = 0
 
@@ -84,7 +84,7 @@ for message in consumer:
             print(message.value)
             WORKER_ID = message.value['WORKER_ID']
 
-    else:
+    elif message.topic== colector_topics[1]:
         if message.key == WORKER_ID:
             print(message.value)
             # get machine to scan
@@ -105,7 +105,7 @@ for message in consumer:
                 continue
             
             print("vai mandar")
-            producer.send(colector_topics[1], key=WORKER_ID, value=output_json)
+            producer.send(colector_topics[2], key=WORKER_ID, value=output_json)
             producer.flush()
     
 #logging.warning(message.topic)
