@@ -93,7 +93,7 @@ for message in consumer:
             machine = message.value["MACHINE"]
 
             # default scrapping value
-            if message.value["SCRAP_LEVEL"] == 2:
+            if message.value["SCRAP_LEVEL"] == '2':
                 # pull image from registry
                 os.system("docker pull localhost/vulscan:latest")
                 # runn image
@@ -101,9 +101,9 @@ for message in consumer:
 
                 output_json = convert_to_json("out.xml")
 
-            elif message.value["SCRAP_LEVEL"] == 3:
+            elif message.value["SCRAP_LEVEL"] == '3':
                 continue
-            elif message.value["SCRAP_LEVEL"] == 4:
+            elif message.value["SCRAP_LEVEL"] == '4':
                 continue
             
             logging.warning("vai mandar")
