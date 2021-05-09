@@ -11,6 +11,17 @@ import argparse
 import json
 import xmltodict
 
+def convert_to_json(output_file):
+
+    f = open(output_file)
+    xml_content = f.read()
+    f.close()
+
+    #write_file = open("out_json.json", "w")
+    #write_file.write(json.dumps(xmltodict.parse(xml_content), indent=4, sort_keys=True))
+    return json.dumps(xmltodict.parse(xml_content), indent=4, sort_keys=True)
+
+
 
 #time.sleep(30)
 time.sleep(22)
@@ -113,15 +124,7 @@ for message in consumer:
 #logging.warning(message.topic)
 #logging.warning(message.value)
 
-def convert_to_json(output_file):
 
-    f = open(output_file)
-    xml_content = f.read()
-    f.close()
-
-    #write_file = open("out_json.json", "w")
-    #write_file.write(json.dumps(xmltodict.parse(xml_content), indent=4, sort_keys=True))
-    return json.dumps(xmltodict.parse(xml_content), indent=4, sort_keys=True)
     
 
 
