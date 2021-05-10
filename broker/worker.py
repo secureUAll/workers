@@ -112,7 +112,7 @@ for message in consumer:
 
                 # runn image
                 #os.system("docker  run --user \"$(id -u):$(id -g)\" -v `pwd`:`pwd` -w `pwd` -i -t localhost/vulscan:latest -sV --script=vulscan/vulscan.nse " + machine + " -oX out.xml")
-                output_json = convert_to_json("out_ietta.xml")
+                output_json = convert_to_json("cismob_out.xml")
 
             elif message.value["SCRAP_LEVEL"] == '3':
                 continue
