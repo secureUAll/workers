@@ -120,7 +120,7 @@ for message in consumer:
                 continue
             
             logging.warning("vai mandar")
-            producer.send(colector_topics[2], key=bytes([WORKER_ID]), value={"MACHINE":machine, 'OUTPUT':output_json})
+            producer.send(colector_topics[2], key=bytes([WORKER_ID]), value={"MACHINE":machine, "RESULTS":output_json})
             producer.flush()
     
 #logging.warning(message.topic)
