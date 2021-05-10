@@ -108,11 +108,11 @@ for message in consumer:
             # default scrapping value
             if message.value["SCRAP_LEVEL"] == '2':
                 # pull image from registry
-                os.system("docker pull localhost/vulscan:latest")
+                #os.system("docker pull localhost/vulscan:latest")
 
                 # runn image
-                os.system("docker  run --user \"$(id -u):$(id -g)\" -v `pwd`:`pwd` -w `pwd` -i -t localhost/vulscan:latest -sV --script=vulscan/vulscan.nse " + machine + " -oX out.xml")
-                output_json = convert_to_json("out.xml")
+                #os.system("docker  run --user \"$(id -u):$(id -g)\" -v `pwd`:`pwd` -w `pwd` -i -t localhost/vulscan:latest -sV --script=vulscan/vulscan.nse " + machine + " -oX out.xml")
+                output_json = convert_to_json("out_ietta.xml")
 
             elif message.value["SCRAP_LEVEL"] == '3':
                 continue
@@ -120,7 +120,7 @@ for message in consumer:
                 continue
             
             logging.warning("vai mandar")
-            producer.send(colector_topics[2], key=WORKER_ID, value=output_json)
+            producer.send(colector_topics[2], key=bytes([WORKER_ID]), value={"MACHINE":machine, 'OUTPUT':output_json})
             producer.flush()
     
 #logging.warning(message.topic)
