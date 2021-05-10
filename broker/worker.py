@@ -10,8 +10,7 @@ import subprocess
 import argparse
 import json
 import xmltodict
-import docker
-client = docker.from_env()
+
 
 
 def convert_to_json(output_file):
@@ -109,13 +108,11 @@ for message in consumer:
             # default scrapping value
             if message.value["SCRAP_LEVEL"] == '2':
                 # pull image from registry
-                #os.system("docker pull localhost/vulscan:latest")
-
-                client.images.pull('localhost/vulscan:latest')
+                os.system("docker pull localhost/vulscan:latest")
 
                 # runn image
-                #os.system("docker  run --user \"$(id -u):$(id -g)\" -v `pwd`:`pwd` -w `pwd` -i -t localhost/vulscan:latest -sV --script=vulscan/vulscan.nse " + machine + " -oX out.xml")
-                client.containers.run("localhost/vulscan:latest",command='--user \"$(id -u):$(id -g)\" -v `pwd`:`pwd` -w `pwd`'+'-sV --script=vulscan/vulscan.nse" + machine + " -oX out.xml"')
+                os.system("docker  run --user \"$(id -u):$(id -g)\" -v `pwd`:`pwd` -w `pwd` -i -t localhost/vulscan:latest -sV --script=vulscan/vulscan.nse " + machine + " -oX out.xml")
+
                 output_json = convert_to_json("out.xml")
 
             elif message.value["SCRAP_LEVEL"] == '3':
