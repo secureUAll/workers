@@ -10,8 +10,7 @@ import subprocess
 import argparse
 import json
 import xmltodict
-import docker
-client = docker.from_env()
+
 
 
 def convert_to_json(output_file):
