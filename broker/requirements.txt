@@ -3,3 +3,4 @@ celery
 kafka-python
 pykafka
 xmltodict
+docker
