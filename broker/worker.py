@@ -108,10 +108,10 @@ for message in consumer:
             # default scrapping value
             if message.value["SCRAP_LEVEL"] == '2':
                 # pull image from registry
-                #os.system("docker pull localhost/vulscan:latest")
+                os.system("docker pull localhost:5000/vulscan")
 
                 # runn image
-                #os.system("docker  run --user \"$(id -u):$(id -g)\" -v `pwd`:`pwd` -w `pwd` -i -t localhost/vulscan:latest -sV --script=vulscan/vulscan.nse " + machine + " -oX out.xml")
+                os.system("docker  run --user \"$(id -u):$(id -g)\" -v `pwd`:`pwd` -w `pwd` -i -t localhost:5000/vulscan -sV --script=vulscan/vulscan.nse " + machine + " -oX out.xml")
                 output_json = convert_to_json("cismob_out.xml")
 
             elif message.value["SCRAP_LEVEL"] == '3':
