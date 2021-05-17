@@ -24,14 +24,16 @@ def convert_to_json(output_file):
 
 #os.system("docker pull localhost:5000/vulscan")
 
-# runn image
-#os.system("touch out.xml")
-#os.system("chmod ugo+rwx out.xml")
-os.system("docker  run --user \"$(id -u):$(id -g)\" --rm -v `pwd`:`pwd` -w `pwd` -t teste_vulscan -sV --script=vulscan/vulscan.nse deti-cismob.ua.pt -oX out.xml")
-#os.system("cd broker")
-os.system("ls -la")
+
+os.system("docker  run --name=\"vulscan_docker\" --user \"$(id -u):$(id -g)\" --volume=`pwd`:`pwd` --workdir=`pwd` -t teste_vulscan -sV --script=vulscan/vulscan.nse deti-cismob.ua.pt -oX out.xml")
+
+os.system("docker cp vulscan_docker:/var/temp/out.xml .")
+
+os.system("docker container stop teste_cp")
+os.system("docker container rm teste_cp")
 #os.system("cat out.xml")
 output_json = convert_to_json("out.xml")
+print(output_json)
 
        
     
