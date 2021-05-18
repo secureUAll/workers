@@ -111,8 +111,15 @@ for message in consumer:
                 os.system("docker pull localhost:5000/vulscan")
 
                 # runn image
-                os.system("docker  run --user \"$(id -u):$(id -g)\" -v `pwd`:`pwd` -w `pwd` -i -t localhost:5000/vulscan -sV --script=vulscan/vulscan.nse " + machine + " -oX out.xml")
-                output_json = convert_to_json("cismob_out.xml")
+                os.system("docker  run --name=\"vulscan_docker\" --user \"$(id -u):$(id -g)\" --volume=`pwd`:`pwd` --workdir=`pwd` -t localhost:5000/vulscan -sV --script=vulscan/vulscan.nse " + machine + " -oX out.xml")
+                #copy file to container
+                os.system("docker cp vulscan_docker:/var/temp/out.xml .")
+                #stop and remove containers
+                os.system("docker container stop vulscan_docker")
+                os.system("docker container rm vulscan_docker")
+
+
+                output_json = convert_to_json("out.xml")
 
             elif message.value["SCRAP_LEVEL"] == '3':
                 continue

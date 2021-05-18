@@ -29,8 +29,8 @@ os.system("docker  run --name=\"vulscan_docker\" --user \"$(id -u):$(id -g)\" --
 
 os.system("docker cp vulscan_docker:/var/temp/out.xml .")
 
-os.system("docker container stop teste_cp")
-os.system("docker container rm teste_cp")
+os.system("docker container stop vulscan_docker")
+os.system("docker container rm vulscan_docker")
 #os.system("cat out.xml")
 output_json = convert_to_json("out.xml")
 print(output_json)
