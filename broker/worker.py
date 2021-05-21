@@ -138,7 +138,7 @@ for message in consumer:
 
                 #sending output
                 logging.warning("vai mandar")
-                producer.send(colector_topics[2], key=bytes([WORKER_ID]), value={"MACHINE":machine, "RESULTS":json_nikto})
+                producer.send(colector_topics[2], key=bytes([WORKER_ID]), value={"MACHINE":machine, "TOOL": "nikto", "LEVEL": 1, "RESULTS":json_nikto})
                 producer.flush()
 
             # level 2 (default)
@@ -157,7 +157,7 @@ for message in consumer:
                 output_json = convert_to_json("out_vulscan.xml")
 
                 logging.warning("vai mandar")
-                producer.send(colector_topics[2], key=bytes([WORKER_ID]), value={"MACHINE":machine, "RESULTS":output_json})
+                producer.send(colector_topics[2], key=bytes([WORKER_ID]), value={"MACHINE":machine, "TOOL": "vulscan", "LEVEL": 2, "RESULTS":output_json})
                 producer.flush()
 
             # level 3
