@@ -24,7 +24,8 @@ def convert_to_json(output_file):
 # read json file
 def read_json_file(output_file):
     with open(output_file, "r") as f:
-            data = json.load(f)
+            #data = json.loads(f.read())
+            data = f.read()
             return json.dumps(data, indent=4, sort_keys=True)
 
 
