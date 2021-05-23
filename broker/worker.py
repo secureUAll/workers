@@ -121,6 +121,13 @@ for message in consumer:
             # get scrapping level
             scrapping_level = int(message.value["SCRAP_LEVEL"])
 
+
+            # removing potential non-stopped containers from previous scan
+            os.system("docker container stop nikto_docker")
+            os.system("docker container rm nikto_docker")
+            os.system("docker container stop vulscan_docker")
+            os.system("docker container rm vulscan_docker")
+
             # level 1
             if scrapping_level >= 1:
                 # pull image from registry
