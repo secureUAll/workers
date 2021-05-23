@@ -12,8 +12,8 @@ import json
 import xmltodict
 
 
-# convert xml to json
-def convert_to_json(output_file):
+# parse vulscan output
+def parse_vulscan(output_file):
     f = open(output_file)
     xml_content = f.read()
     f.close()
@@ -258,7 +258,7 @@ for message in consumer:
                 os.system("docker container rm vulscan_docker")
 
                 # convert from xml to json
-                output_json = convert_to_json("out_vulscan.xml")
+                output_json = parse_vulscan("out_vulscan.xml")
 
                 logging.warning("vai mandar")
                 producer.send(colector_topics[2], key=bytes([WORKER_ID]), value={"MACHINE":machine, "TOOL": "vulscan", "LEVEL": 2, "RESULTS":output_json})
