@@ -37,7 +37,11 @@ if data["nmaprun"]["runstats"]["hosts"]["@up"] != '0':
     output_json["address"] = dict()
     output_json["address"]["addr"] = data["nmaprun"]["host"]["address"]["@addr"] if ("@addr" in data["nmaprun"]["host"]["address"]) else None
     output_json["address"]["addrtype"] = data["nmaprun"]["host"]["address"]["@addrtype"] if ("@addrtype" in data["nmaprun"]["host"]["address"]) else None
-    output_json["address"]["addrname"] = data["nmaprun"]["host"]["hostnames"]["hostname"][0]["@name"] if ("@name" in data["nmaprun"]["host"]["hostnames"]["hostname"][0]) else None
+
+    if isinstance(data["nmaprun"]["host"]["hostnames"]["hostname"], list):
+        output_json["address"]["addrname"] = data["nmaprun"]["host"]["hostnames"]["hostname"][0]["@name"] if ("@name" in data["nmaprun"]["host"]["hostnames"]["hostname"][0]) else None
+    else:
+        output_json["address"]["addrname"] = data["nmaprun"]["host"]["hostnames"]["hostname"]["@name"] if ("@name" in data["nmaprun"]["host"]["hostnames"]["hostname"]) else None
 
     # ----------------------------------------- adding closed ports -----------------------------------------
     output_json["closed_ports"] = data["nmaprun"]["host"]["ports"]["extraports"]["@count"] if ("extraports" in data["nmaprun"]["host"]["ports"]) else None
