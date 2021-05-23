@@ -30,7 +30,7 @@ output_json["scan_info"]["type"] = data["nmaprun"]["scaninfo"]["@type"] if ("@ty
 output_json["scan_info"]["protocol"] = data["nmaprun"]["scaninfo"]["@protocol"] if ("@protocol" in data["nmaprun"]["scaninfo"]) else None
 output_json["scan_info"]["services_number"] = data["nmaprun"]["scaninfo"]["@numservices"] if ("@numservices" in data["nmaprun"]["scaninfo"]) else None
 
-# ------------------------ adding host_info ------------------------- #
+# ------------------------ adding host info ------------------------- #
 
 output_json["address"] = dict()
 
@@ -53,6 +53,30 @@ if isinstance(data["nmaprun"]["host"]["ports"]["port"], list):
         element["os"] = l["service"]["@ostype"] if ("@ostype" in l["service"]) else None
         element["method"] = l["service"]["@method"] if ("@method" in l["service"]) else None
 
+        if "script" in l:
+            element["script"] = dict()
+
+            element["script"]["id"] = l["script"]["@id"] if ("@id" in l["script"]) else None
+            element["script"]["output"] = l["script"]["@output"] if ("@output" in l["script"]) else None
+
+            if "table" in l["script"]:
+                if isinstance(l["script"]["table"], list):
+                    element["script"]["keys"] = list()
+
+                    for e in l["script"]["table"]: #for each elem on the table, create a dictionary that will have the following keys: key, bits, type, and fingerprint
+                        d = dict()
+
+                        for j in e["elem"]:
+                            d[j["@key"]] = j["#text"] # for each elem, merge all dictionaries into a single dictionary
+
+                        element["script"]["keys"].append(d)
+
+                else:
+                    element["script"]["keys"] = dict()
+
+                    for k in l["script"]["table"]["elem"]:
+                        element["script"]["keys"][k["@key"]] = k["#text"]
+
         output_json["ports"].append(element)
 
 else:
@@ -66,15 +90,17 @@ else:
     output_json["ports"]["os"] = data["nmaprun"]["host"]["ports"]["port"]["service"]["@ostype"] if ("@ostype" in data["nmaprun"]["host"]["ports"]["port"]["service"]) else None
     output_json["ports"]["method"] = data["nmaprun"]["host"]["ports"]["port"]["service"]["@method"] if ("@method" in data["nmaprun"]["host"]["ports"]["port"]["service"]) else None
 
+# -------------------------- adding run stats -------------------------- #
+output_json["run_stats"] = dict()
+output_json["run_stats"]["time"] = data["nmaprun"]["runstats"]["finished"]["@timestr"] if ("@timestr" in data["nmaprun"]["runstats"]["finished"]) else None
+output_json["run_stats"]["summary"] = data["nmaprun"]["runstats"]["finished"]["@summary"] if ("@summary" in data["nmaprun"]["runstats"]["finished"]) else None
+output_json["run_stats"]["elapsed_time"] = data["nmaprun"]["runstats"]["finished"]["@elapsed"] if ("@elapsed" in data["nmaprun"]["runstats"]["finished"]) else None
+output_json["run_stats"]["exit_code"] = data["nmaprun"]["runstats"]["finished"]["@exit"] if ("@exit" in data["nmaprun"]["runstats"]["finished"]) else None
+
+output_json["run_stats"]["host"] = dict()
+output_json["run_stats"]["host"]["up"] = data["nmaprun"]["runstats"]["hosts"]["@up"] if ("@up" in data["nmaprun"]["runstats"]["hosts"]) else None
+output_json["run_stats"]["host"]["down"] = data["nmaprun"]["runstats"]["hosts"]["@down"] if ("@down" in data["nmaprun"]["runstats"]["hosts"]) else None
+output_json["run_stats"]["host"]["total"] = data["nmaprun"]["runstats"]["hosts"]["@total"] if ("@total" in data["nmaprun"]["runstats"]["hosts"]) else None
 
 
-
-
-
-
-
-
-
-
-
-print(json.dumps(output_json, indent = 2))
+print(json.dumps(output_json, indent = 3))
