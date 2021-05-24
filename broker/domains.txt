@@ -1,7 +1,6 @@
 xcoa.av.it.pt
 www.ieeta.pt
 deti-cmd.ua.pt
-aws.atnog.av.it.pt
 api.web.ua.pt
 deti-cismob.ua.pt
 srv1-deti.ua.pt

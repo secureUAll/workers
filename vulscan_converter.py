@@ -15,7 +15,7 @@ f.close()
 #data = json.dumps(xmltodict.parse(xml_content), indent=4, sort_keys=True)
 data = xmltodict.parse(xml_content)
 
-#print(json.dumps(data, indent=2))
+print(json.dumps(data, indent=2))
 
 output_json = dict()
 
@@ -122,7 +122,7 @@ else:
 #print(output_json)
 #json_object = json.loads(output_json)
 
-print(json.dumps(output_json, indent=2))
+#print(json.dumps(output_json, indent=2))
 
 #print(data)
 
