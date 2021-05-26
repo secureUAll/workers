@@ -212,6 +212,7 @@ for message in consumer:
         # in case request is to this worker
         if int.from_bytes(message.key,"big") == WORKER_ID:
 
+            output=[]
             logging.warning(message.value)
             # get machine to scan
             machine = message.value["MACHINE"]
@@ -239,11 +240,12 @@ for message in consumer:
 
                 #getting json data from file
                 json_nikto = read_json_file("out_nikto.json")
-
+                json_nikto["TOOL"] ="nikto"
+                output.append(json_nikto)
                 #sending output
-                logging.warning("vai mandar")
-                producer.send(colector_topics[2], key=bytes([WORKER_ID]), value={"MACHINE":machine, "TOOL": "nikto", "LEVEL": 1, "RESULTS":json_nikto})
-                producer.flush()
+                #logging.warning("vai mandar")
+                #producer.send(colector_topics[2], key=bytes([WORKER_ID]), value={"MACHINE":machine, "TOOL": "nikto", "LEVEL": 1, "RESULTS":json_nikto})
+                #producer.flush()
 
             # level 2 (default)
             if scrapping_level >= 2:
@@ -259,10 +261,11 @@ for message in consumer:
 
                 # convert from xml to json
                 output_json = parse_vulscan("out_vulscan.xml")
-
-                logging.warning("vai mandar")
-                producer.send(colector_topics[2], key=bytes([WORKER_ID]), value={"MACHINE":machine, "TOOL": "vulscan", "LEVEL": 2, "RESULTS":output_json})
-                producer.flush()
+                output_json["TOOL"] ="vulscan"
+                output.append(output_json)
+                #logging.warning("vai mandar")
+                #producer.send(colector_topics[2], key=bytes([WORKER_ID]), value={"MACHINE":machine, "TOOL": "vulscan", "LEVEL": 2, "RESULTS":output_json})
+                #producer.flush()
 
             # level 3
             if scrapping_level >= 3:
@@ -271,6 +274,9 @@ for message in consumer:
             # level 4
             if scrapping_level >= 4:
                 continue
+
+            producer.send(colector_topics[2], key=bytes([WORKER_ID]), value={"MACHINE":machine,  "LEVEL": scrapping_level, "RESULTS":output})
+            producer.flush()
 
 #logging.warning(message.topic)
 #logging.warning(message.value)
