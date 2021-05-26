@@ -122,11 +122,10 @@ def parse_vulscan(output_file):
 def read_json_file(output_file,tool=""):
     with open(output_file, "rb") as f:
         #data = json.loads(f.read())
-        #data = f.read()
-        #data=json.dumps(data, indent=4, sort_keys=True)
-        data_final= json.load(f)
-        data_final["TOOL"]=tool
-        return json.dumps(data_final)
+        data = f.read()
+        #data_final= json.load(f)
+        #data_final["TOOL"]=tool
+        return json.dumps(data, indent=4, sort_keys=True)
 
 #time.sleep(30)
 #time.sleep(22)
