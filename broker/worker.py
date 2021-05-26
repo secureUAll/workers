@@ -115,14 +115,15 @@ def parse_vulscan(output_file):
         output_json["state"] = "down"
 
     #print(json.dumps(output_json, indent=2))
-
+    output_json["TOOL"] ="vulscan"
     return json.dumps(output_json, indent=4)
 
 # read json file
-def read_json_file(output_file):
+def read_json_file(output_file,tool=""):
     with open(output_file, "r") as f:
             #data = json.loads(f.read())
             data = f.read()
+            data["TOOL"] =tool
             return json.dumps(data, indent=4, sort_keys=True)
 
 
@@ -239,8 +240,7 @@ for message in consumer:
                 os.system("docker container rm nikto_docker")
 
                 #getting json data from file
-                json_nikto = read_json_file("out_nikto.json")
-                json_nikto["TOOL"] ="nikto"
+                json_nikto = read_json_file("out_nikto.json",tool="nikto")
                 output.append(json_nikto)
                 #sending output
                 #logging.warning("vai mandar")
@@ -261,7 +261,7 @@ for message in consumer:
 
                 # convert from xml to json
                 output_json = parse_vulscan("out_vulscan.xml")
-                output_json["TOOL"] ="vulscan"
+
                 output.append(output_json)
                 #logging.warning("vai mandar")
                 #producer.send(colector_topics[2], key=bytes([WORKER_ID]), value={"MACHINE":machine, "TOOL": "vulscan", "LEVEL": 2, "RESULTS":output_json})
