@@ -1,8 +1,12 @@
 from pymongo import MongoClient
 from kafka import KafkaConsumer, KafkaProducer
 from kafka.errors import KafkaError
+
+# converter files import
 from nmap_converter import *
 from vulscan_converter import *
+from nikto_converter import *
+
 import os 
 import json
 import logging
@@ -12,19 +16,8 @@ import subprocess
 import argparse
 import json
 import xmltodict
+import random
 
-
-# read json file
-def read_json_file(output_file,tool=""):
-    with open(output_file, "r") as f:
-        #data = json.loads(f.read())
-        data = f.read()
-        #data_final= json.load(f)
-        #data_final["TOOL"]=tool
-        return json.dumps(data, indent=4, sort_keys=True)
-
-#time.sleep(30)
-#time.sleep(22)
 
 # topics from colector
 colector_topics=['INIT','SCAN_REQUEST','LOG']
@@ -81,12 +74,12 @@ with open("domains.txt", "r") as f:
         domains.append(line)
 
 #random to init message 
-random = os.urandom(16)
+random_id = os.urandom(16)
 # message with domains
 message = {'CONFIG':{'ADDRESS_LIST':domains}}
 
 # Send address list
-producer.send(colector_topics[0], key=random , value=message)
+producer.send(colector_topics[0], key=random_id , value=message)
 producer.flush()
 
 # consumer loop
@@ -95,7 +88,7 @@ for message in consumer:
     # initial message response to save WORKER_ID
     if message.topic == "INIT":
         # Get ID
-        if message.key == random and "WORKER_ID" in message.value:
+        if message.key == random_id and "WORKER_ID" in message.value:
             # getting actual Worker ID
             logging.warning(message.value)
             WORKER_ID = message.value['WORKER_ID']
@@ -132,17 +125,21 @@ for message in consumer:
 
                 # pull image from registry
                 os.system("docker pull localhost:5000/nikto")
+                # erase output file
+                random_filename = str(random.randint(0, 100000)) + ".json"
                 # run tool
-                os.system("docker run --name=\"nikto_docker\" --user \"$(id -u):$(id -g)\" --volume=`pwd`:`pwd` --workdir=`pwd` -t localhost:5000/nikto -h " + machine + " -o out_nikto.json")
+                os.system("docker run --name=\"nikto_docker\" --user \"$(id -u):$(id -g)\" --volume=`pwd`:`pwd` --workdir=`pwd` -t localhost:5000/nikto -h " + machine + " -o " +  random_filename)
                 #copy file to container
-                os.system("docker cp nikto_docker:/var/temp/out_nikto.json .")
+                os.system("docker cp nikto_docker:/var/temp/" + random_filename + " .")
+
                 #stop and remove containers
                 os.system("docker container stop nikto_docker")
                 os.system("docker container rm nikto_docker")
-
+                
                 #getting json data from file
-                json_nikto = read_json_file("out_nikto.json", tool = "nikto")
+                json_nikto = nikto_converter(random_filename)
                 output.append(json_nikto)
+                os.system("rm " + random_filename)
 
                 #producer.send(colector_topics[2], key=bytes([WORKER_ID]), value={"MACHINE":machine, "TOOL": "nikto", "LEVEL": 1, "RESULTS":json_nikto})
                 #producer.flush()
