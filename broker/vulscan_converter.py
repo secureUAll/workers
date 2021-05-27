@@ -37,19 +37,19 @@ def vulscan_converter(filename):
 
         # ----------------------------------------- adding address infos -----------------------------------------
         output_json["address"] = dict()
-        output_json["address"]["addr"] = data["nmaprun"]["host"]["address"]["@addr"] if ("@addr" in data["nmaprun"]["host"]["address"]) else None
-        output_json["address"]["addrtype"] = data["nmaprun"]["host"]["address"]["@addrtype"] if ("@addrtype" in data["nmaprun"]["host"]["address"]) else None
+        output_json["address"]["address_ip"] = data["nmaprun"]["host"]["address"]["@addr"] if ("@addr" in data["nmaprun"]["host"]["address"]) else None
+        output_json["address"]["address_type"] = data["nmaprun"]["host"]["address"]["@addrtype"] if ("@addrtype" in data["nmaprun"]["host"]["address"]) else None
 
         if isinstance(data["nmaprun"]["host"]["hostnames"]["hostname"], list):
-            output_json["address"]["addrname"] = data["nmaprun"]["host"]["hostnames"]["hostname"][0]["@name"] if ("@name" in data["nmaprun"]["host"]["hostnames"]["hostname"][0]) else None
+            output_json["address"]["address_name"] = data["nmaprun"]["host"]["hostnames"]["hostname"][0]["@name"] if ("@name" in data["nmaprun"]["host"]["hostnames"]["hostname"][0]) else None
         else:
-            output_json["address"]["addrname"] = data["nmaprun"]["host"]["hostnames"]["hostname"]["@name"] if ("@name" in data["nmaprun"]["host"]["hostnames"]["hostname"]) else None
+            output_json["address"]["address_name"] = data["nmaprun"]["host"]["hostnames"]["hostname"]["@name"] if ("@name" in data["nmaprun"]["host"]["hostnames"]["hostname"]) else None
 
         # ----------------------------------------- adding closed ports -----------------------------------------
         output_json["closed_ports"] = data["nmaprun"]["host"]["ports"]["extraports"]["@count"] if ("extraports" in data["nmaprun"]["host"]["ports"]) else None
 
         # ----------------------------------------- adding output from each port -----------------------------------------
-        output_json["scan"] = list()
+        output_json["ports"] = list()
 
         if "ports" in data["nmaprun"]["host"]:
             if "port" in data["nmaprun"]["host"]["ports"]:
@@ -61,18 +61,17 @@ def vulscan_converter(filename):
                 for port in scan_list:
                     # adding port infos
                     element = dict()
-                    element["portid"] = port["@portid"] if ("@portid" in port) else None
+                    element["id"] = port["@portid"] if ("@portid" in port) else None
                     element["protocol"] = port["@protocol"] if ("@protocol" in port) else None
                     element["state"] = port["state"]["@state"] if ("@state" in port["state"]) else None
 
                     # adding port service info
-                    element["service"] = dict()
                     for service_elem in port["service"]:
-                        element["service"]["method"] = port["service"]["@method"] if ("@method" in port["service"]) else None
-                        element["service"]["connection"] = port["service"]["@name"] if ("@name" in port["service"]) else None
-                        element["service"]["os"] = port["service"]["@ostype"] if ("@ostype" in port["service"]) else None
-                        element["service"]["product"] = port["service"]["@product"] if ("@product" in port["service"]) else None
-                        element["service"]["version"] = port["service"]["@version"] if ("@version" in port["service"]) else None
+                        element["method"] = port["service"]["@method"] if ("@method" in port["service"]) else None
+                        element["name"] = port["service"]["@name"] if ("@name" in port["service"]) else None
+                        element["os"] = port["service"]["@ostype"] if ("@ostype" in port["service"]) else None
+                        element["product"] = port["service"]["@product"] if ("@product" in port["service"]) else None
+                        element["version"] = port["service"]["@version"] if ("@version" in port["service"]) else None
 
                     # in case port isn't closed
                     if "script" in port:
@@ -109,7 +108,7 @@ def vulscan_converter(filename):
                             for x in str_list:
                                 element["output"].append(x)
                     # adding each port
-                    output_json["scan"].append(element)
+                    output_json["ports"].append(element)
 
                 # adding finished info
                 output_json["stats"] = dict()
