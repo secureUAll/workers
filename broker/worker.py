@@ -1,6 +1,7 @@
 from pymongo import MongoClient
 from kafka import KafkaConsumer, KafkaProducer
 from kafka.errors import KafkaError
+from nmap_converter import *
 import os 
 import json
 import logging
@@ -229,9 +230,14 @@ for message in consumer:
             os.system("docker container rm nikto_docker")
             os.system("docker container stop vulscan_docker")
             os.system("docker container rm vulscan_docker")
+            os.system("docker container stop nmap_docker")
+            os.system("docker container rm nmap_docker")
 
             # level 1
             if scrapping_level >= 1:
+
+                # ------- NIKTO ------- #
+
                 # pull image from registry
                 os.system("docker pull localhost:5000/nikto")
                 # run tool
@@ -243,12 +249,25 @@ for message in consumer:
                 os.system("docker container rm nikto_docker")
 
                 #getting json data from file
-                json_nikto = read_json_file("out_nikto.json",tool="nikto")
+                json_nikto = read_json_file("out_nikto.json", tool = "nikto")
                 output.append(json_nikto)
-                #sending output
-                #logging.warning("vai mandar")
+
                 #producer.send(colector_topics[2], key=bytes([WORKER_ID]), value={"MACHINE":machine, "TOOL": "nikto", "LEVEL": 1, "RESULTS":json_nikto})
                 #producer.flush()
+
+
+                os.system("docker pull localhost:5000/nmap")
+                # run tool
+                os.system("docker run --name=\"nmap_docker\" --user \"$(id -u):$(id -g)\" --volume=`pwd`:`pwd` --workdir=`pwd` -t localhost:5000/nmap -A -T5 " + machine + " -oX nmap_output.xml")
+                #copy file to container
+                os.system("docker cp nmap_docker:/var/temp/nmap_output.xml .")
+                #stop and remove containers
+                os.system("docker container stop nmap_docker")
+                os.system("docker container rm nmap_docker")
+
+                nmap_output = nmap_converter("nmap_output.xml")
+                output.append(nmap_output)
+
 
             # level 2 (default)
             if scrapping_level >= 2:
