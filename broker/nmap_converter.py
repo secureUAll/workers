@@ -108,4 +108,4 @@ def nmap_converter(filename):
 
 
     #print(json.dumps(output_json, indent = 3))
-    return json.dumps(output_json, indent = 3)
+    return json.dumps(output_json, indent = 2)
