@@ -49,66 +49,69 @@ def parse_vulscan(output_file):
         # ----------------------------------------- adding output from each port -----------------------------------------
         output_json["scan"] = list()
 
-        # getting scanned ports list
-        scan_list = data["nmaprun"]["host"]["ports"]["port"]
+        if "ports" in data["nmaprun"]["host"]:
+            if "port" in data["nmaprun"]["host"]["ports"]:
 
-        # for each port
-        for port in scan_list:
-            # adding port infos
-            element = dict()
-            element["portid"] = port["@portid"] if ("@portid" in port) else None
-            element["protocol"] = port["@protocol"] if ("@protocol" in port) else None
-            element["state"] = port["state"]["@state"] if ("@state" in port["state"]) else None
+                # getting scanned ports list
+                scan_list = data["nmaprun"]["host"]["ports"]["port"]
 
-            # adding port service info
-            element["service"] = dict()
-            for service_elem in port["service"]:
-                element["service"]["method"] = port["service"]["@method"] if ("@method" in port["service"]) else None
-                element["service"]["connection"] = port["service"]["@name"] if ("@name" in port["service"]) else None
-                element["service"]["os"] = port["service"]["@ostype"] if ("@ostype" in port["service"]) else None
-                element["service"]["product"] = port["service"]["@product"] if ("@product" in port["service"]) else None
-                element["service"]["version"] = port["service"]["@version"] if ("@version" in port["service"]) else None
+                # for each port
+                for port in scan_list:
+                    # adding port infos
+                    element = dict()
+                    element["portid"] = port["@portid"] if ("@portid" in port) else None
+                    element["protocol"] = port["@protocol"] if ("@protocol" in port) else None
+                    element["state"] = port["state"]["@state"] if ("@state" in port["state"]) else None
 
-            # in case port isn't closed
-            if "script" in port:
-                # output list
-                element["output"] = list()
+                    # adding port service info
+                    element["service"] = dict()
+                    for service_elem in port["service"]:
+                        element["service"]["method"] = port["service"]["@method"] if ("@method" in port["service"]) else None
+                        element["service"]["connection"] = port["service"]["@name"] if ("@name" in port["service"]) else None
+                        element["service"]["os"] = port["service"]["@ostype"] if ("@ostype" in port["service"]) else None
+                        element["service"]["product"] = port["service"]["@product"] if ("@product" in port["service"]) else None
+                        element["service"]["version"] = port["service"]["@version"] if ("@version" in port["service"]) else None
 
-                # in case output is list (has more that 1 sub scripts)
-                if isinstance(port["script"], list):
-                    # each subscript
-                    each_response = dict()
-                    # for each subscript
-                    for response in port["script"]:
-                        # subscript id
-                        each_response["id"] = response["@id"]
-                        # spliting vulnerability lines
-                        str_vulns = response["@output"]
-                        str_list = str_vulns.split("\n")
-                        # list of vulnerabilities
-                        each_response["list_vulns"] = list()
-                        # for each vulnerability
-                        for x in str_list:
-                            each_response["list_vulns"].append(x)
-                        # append each subscript to output
-                        element["output"].append(each_response)
+                    # in case port isn't closed
+                    if "script" in port:
+                        # output list
+                        element["output"] = list()
 
-                # in case output is only 1 subscript
-                else:
-                    # subscript id
-                    str_id = port["script"]["@id"]
-                    # spliting vulnerability lines
-                    str_vulns = port["script"]["@output"]
-                    str_list = str_vulns.split("\n")
-                    # for each vulnerability
-                    for x in str_list:
-                        element["output"].append(x)
-            # adding each port
-            output_json["scan"].append(element)
+                        # in case output is list (has more that 1 sub scripts)
+                        if isinstance(port["script"], list):
+                            # each subscript
+                            each_response = dict()
+                            # for each subscript
+                            for response in port["script"]:
+                                # subscript id
+                                each_response["id"] = response["@id"]
+                                # spliting vulnerability lines
+                                str_vulns = response["@output"]
+                                str_list = str_vulns.split("\n")
+                                # list of vulnerabilities
+                                each_response["list_vulns"] = list()
+                                # for each vulnerability
+                                for x in str_list:
+                                    each_response["list_vulns"].append(x)
+                                # append each subscript to output
+                                element["output"].append(each_response)
 
-        # adding finished info
-        output_json["stats"] = dict()
-        output_json["stats"]["execution_time"] = data["nmaprun"]["runstats"]["finished"]["@elapsed"]
+                        # in case output is only 1 subscript
+                        else:
+                            # subscript id
+                            str_id = port["script"]["@id"]
+                            # spliting vulnerability lines
+                            str_vulns = port["script"]["@output"]
+                            str_list = str_vulns.split("\n")
+                            # for each vulnerability
+                            for x in str_list:
+                                element["output"].append(x)
+                    # adding each port
+                    output_json["scan"].append(element)
+
+                # adding finished info
+                output_json["stats"] = dict()
+                output_json["stats"]["execution_time"] = data["nmaprun"]["runstats"]["finished"]["@elapsed"]
 
     # if host is down
     else:
