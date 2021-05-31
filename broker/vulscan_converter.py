@@ -123,7 +123,7 @@ def vulscan_converter(filename):
     #print(output_json)
     #json_object = json.loads(output_json)
 
-    print(json.dumps(output_json, indent=2))
+    #print(json.dumps(output_json, indent=2))
 
     #print(data)
 

@@ -128,7 +128,7 @@ for message in consumer:
                 # erase output file
                 random_filename = str(random.randint(0, 100000)) + ".json"
                 # run tool
-                os.system("docker run --name=\"nikto_docker\" --user \"$(id -u):$(id -g)\" --volume=`pwd`:`pwd` --workdir=`pwd` -t localhost:5000/nikto -h " + machine + " -o " +  random_filename)
+                os.system("docker run --name=\"nikto_docker\" --user \"$(id -u):$(id -g)\" --volume=`pwd`:`pwd` --workdir=`pwd` -t localhost:5000/nikto -h " + machine + " -o " + random_filename)
                 #copy file to container
                 os.system("docker cp nikto_docker:/var/temp/" + random_filename + " .")
 

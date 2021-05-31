@@ -107,5 +107,5 @@ def nmap_converter(filename):
     output_json["TOOL"] = "nmap"
 
 
-    #print(json.dumps(output_json, indent = 3))
+    print(json.dumps(output_json, indent = 2))
     return json.dumps(output_json, indent = 2)
