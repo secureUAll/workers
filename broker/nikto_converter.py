@@ -11,11 +11,24 @@ import json
 
 def nikto_converter(filename):
 
-
-    # read and load json from file
-    f = open(filename)
-    file_data = f.read()
-    data = json.loads(file_data)
+    with open(filename, "r") as f:
+        file_data = f.read()
+        try:
+            logging.warning(file_data)
+            data = json.loads(file_data)
+        except:
+            logging.warning(len(file_data))
+            if len(file_data) == 0:
+                output_json = dict()
+                output_json["status"] = "invalid ip"
+                return json.dumps(output_json, indent=2)
+            else:
+                truncated_data = file_data[:len(file_data) - 2]
+                logging.warning(truncated_data)
+                data = json.loads(truncated_data)
+                output_json = dict()
+                output_json["status"] = "nothing found"
+                return json.dumps(output_json, indent=2)
 
     #print(json.dumps(data, indent=2))
 

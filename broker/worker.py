@@ -135,10 +135,11 @@ for message in consumer:
                 #stop and remove containers
                 os.system("docker container stop nikto_docker")
                 os.system("docker container rm nikto_docker")
-                
+                os.system("ls -l " + random_filename)
                 #getting json data from file
                 json_nikto = nikto_converter(random_filename)
                 output.append(json_nikto)
+                
                 os.system("rm " + random_filename)
 
                 #producer.send(colector_topics[2], key=bytes([WORKER_ID]), value={"MACHINE":machine, "TOOL": "nikto", "LEVEL": 1, "RESULTS":json_nikto})
