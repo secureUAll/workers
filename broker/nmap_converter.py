@@ -44,56 +44,58 @@ def nmap_converter(filename):
         output_json["address"]["address_name"] = data["nmaprun"]["hosthint"]["hostnames"]["hostname"]["@name"] if ("@name" in data["nmaprun"]["hosthint"]["hostnames"]["hostname"]) else None
 
     # ------------------------ adding host ports------------------------- #
-    if "port" in data["nmaprun"]["host"]["ports"]:
-        if isinstance(data["nmaprun"]["host"]["ports"]["port"], list):
-            output_json["ports"] = list()
+    if "host" in data["nmaprun"]:
+        if "ports" in data["nmaprun"]["host"]:
+            if "port" in data["nmaprun"]["host"]["ports"]:
+                if isinstance(data["nmaprun"]["host"]["ports"]["port"], list):
+                    output_json["ports"] = list()
 
-            for l in data["nmaprun"]["host"]["ports"]["port"]:
-                element = dict()
-                element["protocol"] = l["@protocol"] if ("@protocol" in l) else None
-                element["id"] = l["@portid"] if ("@portid" in l) else None
-                element["name"] = l["service"]["@name"] if ("@name" in l["service"]) else None
-                element["product"] = l["service"]["@product"] if ("@product" in l["service"]) else None
-                element["version"] = l["service"]["@version"] if ("@version" in l["service"]) else None
-                element["os"] = l["service"]["@ostype"] if ("@ostype" in l["service"]) else None
-                element["method"] = l["service"]["@method"] if ("@method" in l["service"]) else None
+                    for l in data["nmaprun"]["host"]["ports"]["port"]:
+                        element = dict()
+                        element["protocol"] = l["@protocol"] if ("@protocol" in l) else None
+                        element["id"] = l["@portid"] if ("@portid" in l) else None
+                        element["name"] = l["service"]["@name"] if ("@name" in l["service"]) else None
+                        element["product"] = l["service"]["@product"] if ("@product" in l["service"]) else None
+                        element["version"] = l["service"]["@version"] if ("@version" in l["service"]) else None
+                        element["os"] = l["service"]["@ostype"] if ("@ostype" in l["service"]) else None
+                        element["method"] = l["service"]["@method"] if ("@method" in l["service"]) else None
 
-                if "script" in l:
-                    element["script"] = dict()
+                        if "script" in l:
+                            element["script"] = dict()
 
-                    element["script"]["id"] = l["script"]["@id"] if ("@id" in l["script"]) else None
-                    element["script"]["output"] = l["script"]["@output"] if ("@output" in l["script"]) else None
+                            element["script"]["id"] = l["script"]["@id"] if ("@id" in l["script"]) else None
+                            element["script"]["output"] = l["script"]["@output"] if ("@output" in l["script"]) else None
 
-                    if "table" in l["script"]:
-                        if isinstance(l["script"]["table"], list):
-                            element["script"]["keys"] = list()
+                            if "table" in l["script"]:
+                                if isinstance(l["script"]["table"], list):
+                                    element["script"]["keys"] = list()
 
-                            for e in l["script"]["table"]: #for each elem on the table, create a dictionary that will have the following keys: key, bits, type, and fingerprint
-                                d = dict()
+                                    for e in l["script"]["table"]: #for each elem on the table, create a dictionary that will have the following keys: key, bits, type, and fingerprint
+                                        d = dict()
 
-                                for j in e["elem"]:
-                                    d[j["@key"]] = j["#text"] # for each elem, merge all dictionaries into a single dictionary
+                                        for j in e["elem"]:
+                                            d[j["@key"]] = j["#text"] # for each elem, merge all dictionaries into a single dictionary
 
-                                element["script"]["keys"].append(d)
+                                        element["script"]["keys"].append(d)
 
-                        else:
-                            element["script"]["keys"] = dict()
+                                else:
+                                    element["script"]["keys"] = dict()
 
-                            for k in l["script"]["table"]["elem"]:
-                                element["script"]["keys"][k["@key"]] = k["#text"]
+                                    for k in l["script"]["table"]["elem"]:
+                                        element["script"]["keys"][k["@key"]] = k["#text"]
 
-                output_json["ports"].append(element)
+                        output_json["ports"].append(element)
 
-        else:
-            output_json["ports"] = dict()
+                else:
+                    output_json["ports"] = dict()
 
-            output_json["ports"]["protocol"] = data["nmaprun"]["host"]["ports"]["port"]["@protocol"] if ("@protocol" in data["nmaprun"]["host"]["ports"]["port"]) else None
-            output_json["ports"]["id"] = data["nmaprun"]["host"]["ports"]["port"]["@portid"] if ("@portid" in data["nmaprun"]["host"]["ports"]["port"]) else None
-            output_json["ports"]["name"] = data["nmaprun"]["host"]["ports"]["port"]["service"]["@name"] if ("@name" in data["nmaprun"]["host"]["ports"]["port"]["service"]) else None
-            output_json["ports"]["product"] = data["nmaprun"]["host"]["ports"]["port"]["service"]["@product"] if ("@product" in data["nmaprun"]["host"]["ports"]["port"]["service"]) else None
-            output_json["ports"]["version"] = data["nmaprun"]["host"]["ports"]["port"]["service"]["@version"] if ("@version" in data["nmaprun"]["host"]["ports"]["port"]["service"]) else None
-            output_json["ports"]["os"] = data["nmaprun"]["host"]["ports"]["port"]["service"]["@ostype"] if ("@ostype" in data["nmaprun"]["host"]["ports"]["port"]["service"]) else None
-            output_json["ports"]["method"] = data["nmaprun"]["host"]["ports"]["port"]["service"]["@method"] if ("@method" in data["nmaprun"]["host"]["ports"]["port"]["service"]) else None
+                    output_json["ports"]["protocol"] = data["nmaprun"]["host"]["ports"]["port"]["@protocol"] if ("@protocol" in data["nmaprun"]["host"]["ports"]["port"]) else None
+                    output_json["ports"]["id"] = data["nmaprun"]["host"]["ports"]["port"]["@portid"] if ("@portid" in data["nmaprun"]["host"]["ports"]["port"]) else None
+                    output_json["ports"]["name"] = data["nmaprun"]["host"]["ports"]["port"]["service"]["@name"] if ("@name" in data["nmaprun"]["host"]["ports"]["port"]["service"]) else None
+                    output_json["ports"]["product"] = data["nmaprun"]["host"]["ports"]["port"]["service"]["@product"] if ("@product" in data["nmaprun"]["host"]["ports"]["port"]["service"]) else None
+                    output_json["ports"]["version"] = data["nmaprun"]["host"]["ports"]["port"]["service"]["@version"] if ("@version" in data["nmaprun"]["host"]["ports"]["port"]["service"]) else None
+                    output_json["ports"]["os"] = data["nmaprun"]["host"]["ports"]["port"]["service"]["@ostype"] if ("@ostype" in data["nmaprun"]["host"]["ports"]["port"]["service"]) else None
+                    output_json["ports"]["method"] = data["nmaprun"]["host"]["ports"]["port"]["service"]["@method"] if ("@method" in data["nmaprun"]["host"]["ports"]["port"]["service"]) else None
 
     # -------------------------- adding run stats -------------------------- #
     output_json["run_stats"] = dict()
