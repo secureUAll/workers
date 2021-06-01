@@ -15,7 +15,7 @@ def nmap_converter(filename):
 
     data = xmltodict.parse(content)
 
-    #print(json.dumps(data,indent = 2))
+    print(json.dumps(data,indent = 2))
 
     output_json = dict()
 
