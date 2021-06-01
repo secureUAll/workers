@@ -27,19 +27,21 @@ def nmap_converter(filename):
 
     # ------------------------ adding scan_info ------------------------- #
 
-    output_json["scan_info"] = dict()
-    output_json["scan_info"]["type"] = data["nmaprun"]["scaninfo"]["@type"] if ("@type" in data["nmaprun"]["scaninfo"]) else None
-    output_json["scan_info"]["protocol"] = data["nmaprun"]["scaninfo"]["@protocol"] if ("@protocol" in data["nmaprun"]["scaninfo"]) else None
-    output_json["scan_info"]["services_number"] = data["nmaprun"]["scaninfo"]["@numservices"] if ("@numservices" in data["nmaprun"]["scaninfo"]) else None
+    if "scaninfo" in data["nmaprun"]:
+        output_json["scan_info"] = dict()
+        output_json["scan_info"]["type"] = data["nmaprun"]["scaninfo"]["@type"] if ("@type" in data["nmaprun"]["scaninfo"]) else None
+        output_json["scan_info"]["protocol"] = data["nmaprun"]["scaninfo"]["@protocol"] if ("@protocol" in data["nmaprun"]["scaninfo"]) else None
+        output_json["scan_info"]["services_number"] = data["nmaprun"]["scaninfo"]["@numservices"] if ("@numservices" in data["nmaprun"]["scaninfo"]) else None
 
     # ------------------------ adding host info ------------------------- #
 
-    output_json["address"] = dict()
+    if "hosthint" in data["nmaprun"]:
+        output_json["address"] = dict()
 
-    output_json["address"]["address_ip"]= data["nmaprun"]["hosthint"]["address"]["@addr"] if ("@addr" in data["nmaprun"]["hosthint"]) else None
-    output_json["address"]["address_type"] = data["nmaprun"]["hosthint"]["address"]["@addrtype"] if ("@addrtype" in data["nmaprun"]["hosthint"]) else None
+        output_json["address"]["address_ip"]= data["nmaprun"]["hosthint"]["address"]["@addr"] if ("@addr" in data["nmaprun"]["hosthint"]) else None
+        output_json["address"]["address_type"] = data["nmaprun"]["hosthint"]["address"]["@addrtype"] if ("@addrtype" in data["nmaprun"]["hosthint"]) else None
 
-    output_json["address"]["address_name"] = data["nmaprun"]["hosthint"]["hostnames"]["hostname"]["@name"] if ("@name" in data["nmaprun"]["hosthint"]["hostnames"]["hostname"]) else None
+        output_json["address"]["address_name"] = data["nmaprun"]["hosthint"]["hostnames"]["hostname"]["@name"] if ("@name" in data["nmaprun"]["hosthint"]["hostnames"]["hostname"]) else None
 
     # ------------------------ adding host ports------------------------- #
     if "port" in data["nmaprun"]["host"]["ports"]:
