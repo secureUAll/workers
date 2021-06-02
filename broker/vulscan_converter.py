@@ -119,7 +119,7 @@ def vulscan_converter(filename):
     else:
         output_json["state"] = "down"
 
-
+    output_json["TOOL"] = "vulscan"
     #print(output_json)
     #json_object = json.loads(output_json)
 
