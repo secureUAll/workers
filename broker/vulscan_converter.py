@@ -127,4 +127,4 @@ def vulscan_converter(filename):
 
     #print(data)
 
-    return json.dumps(output_json, indent = 2)
+    return output_json

@@ -28,7 +28,7 @@ def nikto_converter(filename):
                 data = json.loads(truncated_data)
                 output_json = dict()
                 output_json["status"] = "nothing found"
-                return json.dumps(output_json, indent=2)
+                return output_json 
 
     #print(json.dumps(data, indent=2))
 
@@ -79,4 +79,4 @@ def nikto_converter(filename):
     print(json.dumps(output_json, indent=2))
     
     
-    return json.dumps(output_json, indent=2)
+    return output_json

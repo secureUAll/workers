@@ -113,4 +113,4 @@ def nmap_converter(filename):
 
 
     print(json.dumps(output_json, indent = 2))
-    return json.dumps(output_json, indent = 2)
+    return output_json
