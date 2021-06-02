@@ -21,12 +21,14 @@ def nikto_converter(filename):
             if len(file_data) == 0:
                 output_json = dict()
                 output_json["status"] = "invalid ip"
-                return json.dumps(output_json, indent=2)
+                output_json["TOOL"] = "nikto"
+                return output_json
             else:
                 truncated_data = file_data[:len(file_data) - 2]
                 logging.warning(truncated_data)
                 data = json.loads(truncated_data)
                 output_json = dict()
+                output_json["TOOL"] = "nikto"
                 output_json["status"] = "nothing found"
                 return output_json 
 
