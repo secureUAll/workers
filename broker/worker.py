@@ -6,6 +6,7 @@ from kafka.errors import KafkaError
 from nmap_converter import *
 from vulscan_converter import *
 from nikto_converter import *
+from zap_converter import *
 
 import os 
 import json
@@ -117,10 +118,11 @@ for message in consumer:
             os.system("docker container rm vulscan_docker")
             os.system("docker container stop nmap_docker")
             os.system("docker container rm nmap_docker")
+            os.system("docker container stop zap_docker")
+            os.system("docker container rm zap_docker")
 
             # level 1
             if scrapping_level >= 1:
-
                 # ------- NIKTO ------- #
 
                 # pull image from registry
@@ -178,6 +180,21 @@ for message in consumer:
                 #logging.warning("vai mandar")
                 #producer.send(colector_topics[2], key=bytes([WORKER_ID]), value={"MACHINE":machine, "TOOL": "vulscan", "LEVEL": 2, "RESULTS":output_json})
                 #producer.flush()
+
+                os.system("docker pull localhost:5000/zap")
+
+                os.system("docker run --name=\"zap_docker\" --user \"$(id -u):$(id -g)\" -v $(pwd):/zap/wrk/:rw -t localhost:5000/zap zap-baseline.py -t http://" + machine + " -J out_zap.json")
+
+                os.system("docker cp zap_docker:/zap/wrk/out_zap.json .")
+
+                os.system("docker container stop zap_docker")
+                os.system("docker container rm zap_docker")
+
+                zap_output = zap_converter("out_zap.json")
+
+                output.append(zap_output)
+                
+                
 
             # level 3
             if scrapping_level >= 3:
