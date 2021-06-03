@@ -17,7 +17,7 @@ def vulscan_converter(filename):
     #data = json.dumps(xmltodict.parse(xml_content), indent=4, sort_keys=True)
     data = xmltodict.parse(xml_content)
 
-    print(json.dumps(data, indent=2))
+    #print(json.dumps(data, indent=2))
 
     output_json = dict()
 
