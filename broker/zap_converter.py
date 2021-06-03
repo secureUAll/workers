@@ -81,5 +81,5 @@ def zap_converter(filename):
 
 
 
-    print(json.dumps(output_json, indent=2))
+    #print(json.dumps(output_json, indent=2))
     return output_json

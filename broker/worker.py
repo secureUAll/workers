@@ -183,7 +183,10 @@ for message in consumer:
 
                 os.system("docker pull localhost:5000/zap")
 
-                os.system("docker run --name=\"zap_docker\" --user \"$(id -u):$(id -g)\" -v $(pwd):/zap/wrk/:rw -t localhost:5000/zap zap-baseline.py -t http://" + machine + " -J out_zap.json")
+                if "http://" or "https://" in machine:
+                    os.system("docker run --name=\"zap_docker\" --user \"$(id -u):$(id -g)\" -v $(pwd):/zap/wrk/:rw -t localhost:5000/zap zap-baseline.py -t " + machine + " -J out_zap.json")
+                else:
+                    os.system("docker run --name=\"zap_docker\" --user \"$(id -u):$(id -g)\" -v $(pwd):/zap/wrk/:rw -t localhost:5000/zap zap-baseline.py -t http://" + machine + " -J out_zap.json")
 
                 os.system("docker cp zap_docker:/zap/wrk/out_zap.json .")
 
