@@ -112,41 +112,17 @@ for message in consumer:
 
 
             # removing potential non-stopped containers from previous scan
-            os.system("docker container stop nikto_docker")
-            os.system("docker container rm nikto_docker")
             os.system("docker container stop vulscan_docker")
             os.system("docker container rm vulscan_docker")
             os.system("docker container stop nmap_docker")
             os.system("docker container rm nmap_docker")
             os.system("docker container stop zap_docker")
             os.system("docker container rm zap_docker")
+            os.system("docker container stop nikto_docker")
+            os.system("docker container rm nikto_docker")
 
             # level 1
             if scrapping_level >= 1:
-                # ------- NIKTO ------- #
-
-                # pull image from registry
-                os.system("docker pull localhost:5000/nikto")
-                # erase output file
-                random_filename = str(random.randint(0, 100000)) + ".json"
-                # run tool
-                os.system("docker run --name=\"nikto_docker\" --user \"$(id -u):$(id -g)\" --volume=`pwd`:`pwd` --workdir=`pwd` -t localhost:5000/nikto -h " + machine + " -o " + random_filename)
-                #copy file to container
-                os.system("docker cp nikto_docker:/var/temp/" + random_filename + " .")
-
-                #stop and remove containers
-                os.system("docker container stop nikto_docker")
-                os.system("docker container rm nikto_docker")
-                os.system("ls -l " + random_filename)
-                #getting json data from file
-                json_nikto = nikto_converter(random_filename)
-                output.append(json_nikto)
-                
-                os.system("rm " + random_filename)
-
-                #producer.send(colector_topics[2], key=bytes([WORKER_ID]), value={"MACHINE":machine, "TOOL": "nikto", "LEVEL": 1, "RESULTS":json_nikto})
-                #producer.flush()
-
 
                 os.system("docker pull localhost:5000/nmap")
                 # run tool
@@ -201,7 +177,29 @@ for message in consumer:
 
             # level 3
             if scrapping_level >= 3:
-                continue
+                # ------- NIKTO ------- #
+
+                # pull image from registry
+                os.system("docker pull localhost:5000/nikto")
+                # erase output file
+                random_filename = str(random.randint(0, 100000)) + ".json"
+                # run tool
+                os.system("docker run --name=\"nikto_docker\" --user \"$(id -u):$(id -g)\" --volume=`pwd`:`pwd` --workdir=`pwd` -t localhost:5000/nikto -h " + machine + " -o " + random_filename)
+                #copy file to container
+                os.system("docker cp nikto_docker:/var/temp/" + random_filename + " .")
+
+                #stop and remove containers
+                os.system("docker container stop nikto_docker")
+                os.system("docker container rm nikto_docker")
+                os.system("ls -l " + random_filename)
+                #getting json data from file
+                json_nikto = nikto_converter(random_filename)
+                output.append(json_nikto)
+                
+                os.system("rm " + random_filename)
+
+                #producer.send(colector_topics[2], key=bytes([WORKER_ID]), value={"MACHINE":machine, "TOOL": "nikto", "LEVEL": 1, "RESULTS":json_nikto})
+                #producer.flush()
 
             # level 4
             if scrapping_level >= 4:
