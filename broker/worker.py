@@ -7,6 +7,7 @@ from nmap_converter import *
 from vulscan_converter import *
 from nikto_converter import *
 from zap_converter import *
+from malware_converter import *
 
 import os 
 import json
@@ -30,6 +31,25 @@ colector_topics=['INIT','SCAN_REQUEST','LOG','UPDATE']
 
 # golbal variable 
 WORKER_ID = 0
+
+malware_ports = {
+                        1080: "mydoom",
+                        2283: "dumaru",
+                        2535: "beagle",
+                        2745: "beagle",
+                        3127: "mydoom",
+                        3128: "mydoom",
+                        3410: "backdoor",
+                        5554: "sasser",
+                        8866: "beagle",
+                        9898: "dabber",
+                        10000: "dumaru",
+                        10080: "mydoom",
+                        12345: "netbus",
+                        17300: "kuang2",
+                        27374: "subseven",
+                        65506: "phatbot"
+                    }
 
 #logging.basicConfig(level=logging.DEBUG)
 
@@ -123,6 +143,8 @@ def consume_messages(random_id):
                 os.system("docker container rm vulscan_docker")
                 os.system("docker container stop nmap_docker")
                 os.system("docker container rm nmap_docker")
+                os.system("docker container stop nmap_docker_malware")
+                os.system("docker container rm nmap_docker_malware")
                 os.system("docker container stop zap_docker")
                 os.system("docker container rm zap_docker")
                 os.system("docker container stop nikto_docker")
@@ -144,6 +166,22 @@ def consume_messages(random_id):
 
                     nmap_output = nmap_converter("nmap_output.xml")
                     output.append(nmap_output)
+
+                    # ------------------------------- Scanning for malwares common ports ----------------------------------------- #
+
+                    os.system("docker pull localhost:5000/nmap")
+                    # run tool
+                    os.system("docker run --name=\"nmap_docker_malware\" --user \"$(id -u):$(id -g)\" --volume=`pwd`:`pwd` --workdir=`pwd` -t localhost:5000/nmap -p 1080,2283,2535,2745,3127,3128,3410,5554,8866,9898,10000,10080,12345,17300,27374,65506 " + machine + " -oX nmap_malware_output.xml")
+                    #copy file to container
+                    os.system("docker cp nmap_docker_malware:/var/temp/nmap_malware_output.xml .")
+                    #stop and remove containers
+                    os.system("docker container stop nmap_docker_malware")
+                    os.system("docker container rm nmap_docker_malware")
+
+                    malware_output = malware_converter("nmap_malware_output.xml")
+
+                    output.append(malware_output)
+
 
 
                 # level 2 (default)
