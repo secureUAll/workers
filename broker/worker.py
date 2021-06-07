@@ -26,7 +26,7 @@ import random
 # ------------------------------------------------------------------------------- #
 
 # topics from colector
-colector_topics=['INIT','SCAN_REQUEST','LOG']
+colector_topics=['INIT','SCAN_REQUEST','LOG','UPDATE']
 
 # golbal variable 
 WORKER_ID = 0
