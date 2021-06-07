@@ -94,6 +94,23 @@ for message in consumer:
             logging.warning(message.value)
             WORKER_ID = message.value['WORKER_ID']
 
+    # topic to update domains
+    elif message.topic == "UPDATE":
+        # check if update is for this worker
+        if int.from_bytes(message.key,"big") == WORKER_ID:
+
+            # get new address list
+            new_address_list = message.value["ADDRESS_LIST"]
+            
+            # write in domains file
+            with open("domains.txt", "w") as f:
+                for dom in new_address_list:
+                    f.write(dom)
+                    f.write("\n")
+
+            # update local variable with domains
+            domains = new_address_list
+
     # scrapping request topic
     elif message.topic== colector_topics[1]:
         # logs
