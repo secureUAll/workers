@@ -26,7 +26,7 @@ import random
 # ------------------------------------------------------------------------------- #
 
 # topics from colector
-colector_topics=['INIT','SCAN_REQUEST','LOG','UPDATE']
+colector_topics=['INIT','SCAN_REQUEST','LOG','UPDATE','HEARTBEAT']
 
 # golbal variable 
 WORKER_ID = 0
@@ -225,6 +225,12 @@ def consume_messages(random_id):
                 # ------------------------------- Send all outputs to colector ----------------------------------------- #
 
                 producer.send(colector_topics[2], key=bytes([WORKER_ID]), value={"MACHINE":machine,  "LEVEL": scrapping_level, "RESULTS":output})
+                producer.flush()
+        
+        elif message.topic=="HEARTBEAT":
+            if message.value["from"]=="colector":
+                print("VAI ENVIAAAR" + str({'from':WORKER_ID, 'to':"colector"}))
+                producer.send("HEARTBEAT", value={'from':WORKER_ID, 'to':"colector"})
                 producer.flush()
 
 #logging.warning(message.topic)
