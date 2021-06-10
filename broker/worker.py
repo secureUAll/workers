@@ -197,7 +197,7 @@ def consume_messages(random_id):
                     # pull image from registry
                     os.system("docker pull localhost:5000/vulscan")
                     # runn tool
-                    os.system("docker run --name=\"vulscan_docker\" --user \"$(id -u):$(id -g)\" --volume=`pwd`:`pwd` --workdir=`pwd` -t localhost:5000/vulscan -sV --script=vulscan/vulscan.nse " + machine + " -oX out_vulscan.xml")
+                    os.system("docker run --name=\"vulscan_docker\" --user \"$(id -u):$(id -g)\" --volume=`pwd`:`pwd` --workdir=`pwd` -t localhost:5000/vulscan:v2 -sV --script=vulscan/vulscan.nse " + machine + " -oX out_vulscan.xml")
                     #copy file to container
                     os.system("docker cp vulscan_docker:/var/temp/out_vulscan.xml .")
                     #stop and remove containers
