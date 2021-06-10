@@ -14,7 +14,7 @@ def zap_converter(filename):
     #print(json.dumps(data, indent=2))
 
     output_json["TOOL"] = "zap"
-
+    output_json["state"] = "up" 
     # ----------------------------------------- adding date -----------------------------------------
     output_json["date"] = data["@generated"] if ("@generated" in data) else None
 

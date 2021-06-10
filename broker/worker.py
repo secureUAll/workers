@@ -107,6 +107,8 @@ def consume_messages(random_id):
 
         # topic to update domains
         elif message.topic == "UPDATE":
+            logging.warning("UPDATE MESSAGE")
+            logging.warning(message.value)
             # check if update is for this worker
             if int.from_bytes(message.key,"big") == WORKER_ID:
 
