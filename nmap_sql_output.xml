@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE nmaprun>
+<?xml-stylesheet href="file:///usr/bin/../share/nmap/nmap.xsl" type="text/xsl"?>
+<!-- Nmap 7.91 scan initiated Wed Jun 16 21:25:59 2021 as: /usr/bin/nmap -sV -&#45;script http-sql-injection -p 80 -oX nmap_sql_output.xml testphp.vulnweb.com -->
+<nmaprun scanner="nmap" args="/usr/bin/nmap -sV -&#45;script http-sql-injection -p 80 -oX nmap_sql_output.xml testphp.vulnweb.com" start="1623878759" startstr="Wed Jun 16 21:25:59 2021" version="7.91" xmloutputversion="1.05">
+<scaninfo type="syn" protocol="tcp" numservices="1" services="80"/>
+<verbose level="0"/>
+<debugging level="0"/>
+<hosthint><status state="up" reason="unknown-response" reason_ttl="0"/>
+<address addr="18.192.172.30" addrtype="ipv4"/>
+<hostnames>
+<hostname name="testphp.vulnweb.com" type="user"/>
+</hostnames>
+</hosthint>
+<host starttime="1623878760" endtime="1623878776"><status state="up" reason="echo-reply" reason_ttl="36"/>
+<address addr="18.192.172.30" addrtype="ipv4"/>
+<hostnames>
+<hostname name="testphp.vulnweb.com" type="user"/>
+<hostname name="ec2-18-192-172-30.eu-central-1.compute.amazonaws.com" type="PTR"/>
+</hostnames>
+<ports><port protocol="tcp" portid="80"><state state="open" reason="syn-ack" reason_ttl="40"/><service name="http" product="nginx" version="1.19.0" method="probed" conf="10"><cpe>cpe:/a:igor_sysoev:nginx:1.19.0</cpe></service><script id="http-sql-injection" output="&#xa;  Possible sqli for queries:&#xa;    http://testphp.vulnweb.com:80/search.php?test=query%27%20OR%20sqlspider&#xa;    http://testphp.vulnweb.com:80/search.php?test=query%27%20OR%20sqlspider&#xa;    http://testphp.vulnweb.com:80/search.php?test=query%27%20OR%20sqlspider&#xa;    http://testphp.vulnweb.com:80/search.php?test=query%27%20OR%20sqlspider&#xa;    http://testphp.vulnweb.com:80/showimage.php?file=%27%20OR%20sqlspider&#xa;    http://testphp.vulnweb.com:80/search.php?test=query%27%20OR%20sqlspider&#xa;    http://testphp.vulnweb.com:80/artists.php?artist=2%27%20OR%20sqlspider&#xa;    http://testphp.vulnweb.com:80/artists.php?artist=1%27%20OR%20sqlspider&#xa;    http://testphp.vulnweb.com:80/search.php?test=query%27%20OR%20sqlspider&#xa;    http://testphp.vulnweb.com:80/artists.php?artist=3%27%20OR%20sqlspider&#xa;    http://testphp.vulnweb.com:80/search.php?test=query%27%20OR%20sqlspider&#xa;    http://testphp.vulnweb.com:80/search.php?test=query%27%20OR%20sqlspider&#xa;    http://testphp.vulnweb.com:80/search.php?test=query%27%20OR%20sqlspider&#xa;    http://testphp.vulnweb.com:80/listproducts.php?cat=2%27%20OR%20sqlspider&#xa;    http://testphp.vulnweb.com:80/listproducts.php?cat=3%27%20OR%20sqlspider&#xa;    http://testphp.vulnweb.com:80/listproducts.php?cat=1%27%20OR%20sqlspider&#xa;    http://testphp.vulnweb.com:80/search.php?test=query%27%20OR%20sqlspider&#xa;    http://testphp.vulnweb.com:80/listproducts.php?cat=4%27%20OR%20sqlspider&#xa;    http://testphp.vulnweb.com:80/showimage.php?file=%27%20OR%20sqlspider&#xa;"/></port>
+</ports>
+<times srtt="57748" rttvar="44148" to="234340"/>
+</host>
+<runstats><finished time="1623878776" timestr="Wed Jun 16 21:26:16 2021" summary="Nmap done at Wed Jun 16 21:26:16 2021; 1 IP address (1 host up) scanned in 17.05 seconds" elapsed="17.05" exit="success"/><hosts up="1" down="0" total="1"/>
+</runstats>
+</nmaprun>
