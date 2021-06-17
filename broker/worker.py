@@ -164,52 +164,6 @@ def consume_messages(random_id):
                 # level 1
                 if scrapping_level >= 1:
 
-                    os.system("docker pull localhost:5000/nmap")
-                    # run tool
-                    os.system("docker run --name=\"nmap_sql_docker\" --user \"$(id -u):$(id -g)\" --volume=`pwd`:`pwd` --workdir=`pwd` -t localhost:5000/nmap -sV --script http-sql-injection " + machine + " -p 80 -oX nmap_sql_output.xml")
-                    #copy file to container
-                    #os.system("docker cp nmap_sql_docker:/var/temp/nmap_sql_output.xml .")
-                    #os.system("cat nmap_sql_output.xml")
-                    #stop and remove containers
-                    os.system("docker container stop nmap_sql_docker")
-                    os.system("docker container rm nmap_sql_docker")
-
-                    nmap_sql_output = nmap_sql_converter("nmap_sql_output.xml")
-                    #logging.warning(nmap_sql_output)
-
-                    output_sqlmap_json = dict()
-                    output_sqlmap_json["TOOL"] = "sqlmap"
-                    output_sqlmap_json["scan"] = list()
-
-                    os.system("docker pull localhost:5000/sqlmap")
-
-
-                    if "script" in nmap_sql_output["ports"]:
-                        if len(nmap_sql_output["ports"]) > 0:
-
-                            for vuln_link in nmap_sql_output["ports"]["script"]:
-                                #logging.warning(vuln_link)
-                                # run tool
-                                os.system("docker run --name=\"sql_docker\" --user \"$(id -u):$(id -g)\" --volume=`pwd`:/root/.local/share/sqlmap/output/ -t localhost:5000/sqlmap -u \"" + vuln_link + "\" --dbs --batch")
-                                #copy file to container
-                                os.system("docker cp sql_docker:/root/.local/share/sqlmap/output/" + machine + "/log .")
-
-                                sqlmap_text = sqlmap_converter("log")
-
-                                os.system("rm log")
-
-                                output_element = dict()
-
-                                output_element[vuln_link] = sqlmap_text
-
-                                output_sqlmap_json["scan"].append(output_element)
-
-                                #stop and remove containers
-                                os.system("docker container stop sql_docker")
-                                os.system("docker container rm sql_docker")
-
-                    output.append(output_sqlmap_json)
-
                     # ------------------------------- Normal nmap tool ----------------------------------------- #
 
                     os.system("docker pull localhost:5000/nmap")
@@ -322,12 +276,16 @@ def consume_messages(random_id):
                     os.system("docker run --name=\"nmap_sql_docker\" --user \"$(id -u):$(id -g)\" --volume=`pwd`:`pwd` --workdir=`pwd` -t localhost:5000/nmap -sV --script http-sql-injection " + machine + " -p 80 -oX nmap_sql_output.xml")
                     #copy file to container
                     os.system("docker cp nmap_sql_docker:/var/temp/nmap_sql_output.xml .")
-                    os.system("cat nmap_sql_output.xml")
                     #stop and remove containers
                     os.system("docker container stop nmap_sql_docker")
                     os.system("docker container rm nmap_sql_docker")
 
                     nmap_sql_output = nmap_sql_converter("nmap_sql_output.xml")
+                    #logging.warning(nmap_sql_output)
+
+                    output_sqlmap_json = dict()
+                    output_sqlmap_json["TOOL"] = "sqlmap"
+                    output_sqlmap_json["scan"] = list()
 
                     os.system("docker pull localhost:5000/sqlmap")
 
@@ -336,15 +294,27 @@ def consume_messages(random_id):
                         if len(nmap_sql_output["ports"]) > 0:
 
                             for vuln_link in nmap_sql_output["ports"]["script"]:
+                                #logging.warning(vuln_link)
                                 # run tool
-                                os.system("docker run --name=\"sql_docker\" --user \"$(id -u):$(id -g)\" --volume=`pwd`:/root/.local/share/sqlmap/output/ -t localhost:5000/sqlmap -u " + vuln_link + " --dbs")
+                                os.system("docker run --name=\"sql_docker\" --user \"$(id -u):$(id -g)\" --volume=`pwd`:/root/.local/share/sqlmap/output/ -t localhost:5000/sqlmap -u \"" + vuln_link + "\" --dbs --batch")
                                 #copy file to container
-                                os.system("docker cp sql_docker:/root/.local/share/sqlmap/output/ .")
-                                os.system("ls")
-                                #os.system("cat nmap_sql_output.xml")
+                                os.system("docker cp sql_docker:/root/.local/share/sqlmap/output/" + machine + "/log .")
+
+                                sqlmap_text = sqlmap_converter("log")
+
+                                os.system("rm log")
+
+                                output_element = dict()
+
+                                output_element[vuln_link] = sqlmap_text
+
+                                output_sqlmap_json["scan"].append(output_element)
+
                                 #stop and remove containers
-                                os.system("docker container stop nmap_sql_docker")
-                                os.system("docker container rm nmap_sql_docker")
+                                os.system("docker container stop sql_docker")
+                                os.system("docker container rm sql_docker")
+
+                    output.append(output_sqlmap_json)
 
 
                     #output.append(nmap_sql_output)
