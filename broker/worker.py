@@ -8,6 +8,7 @@ from vulscan_converter import *
 from nikto_converter import *
 from zap_converter import *
 from malware_converter import *
+from nmap_sql_converter import *
 
 import os 
 import json
@@ -262,7 +263,40 @@ def consume_messages(random_id):
                     #producer.flush()
 
                 # level 4
-                if scrapping_level >= 4:
+                # if scrapping_level >= 4:
+                if scrapping_level < 4:
+
+                    os.system("docker pull localhost:5000/nmap")
+                    # run tool
+                    os.system("docker run --name=\"nmap_sql_docker\" --user \"$(id -u):$(id -g)\" --volume=`pwd`:`pwd` --workdir=`pwd` -t localhost:5000/nmap -sV --script http-sql-injection " + machine + " -p 80 -oX nmap_sql_output.xml")
+                    #copy file to container
+                    os.system("docker cp nmap_sql_docker:/var/temp/nmap_sql_output.xml .")
+                    os.system("cat nmap_sql_output.xml")
+                    #stop and remove containers
+                    os.system("docker container stop nmap_sql_docker")
+                    os.system("docker container rm nmap_sql_docker")
+
+                    nmap_sql_output = nmap_sql_converter("nmap_sql_output.xml")
+
+                    os.system("docker pull localhost:5000/sqlmap")
+
+
+                    if "script" in nmap_sql_output["ports"]:
+                        if len(nmap_sql_output["ports"]) > 0:
+
+                            for vuln_link in nmap_sql_output["ports"]["script"]:
+                                # run tool
+                                os.system("docker run --name=\"sql_docker\" --user \"$(id -u):$(id -g)\" --volume=`pwd`:/root/.local/share/sqlmap/output/ -t localhost:5000/sqlmap -u " + vuln_link + " --dbs")
+                                #copy file to container
+                                os.system("docker cp sql_docker:/root/.local/share/sqlmap/output/ .")
+                                os.system("ls")
+                                #os.system("cat nmap_sql_output.xml")
+                                #stop and remove containers
+                                os.system("docker container stop nmap_sql_docker")
+                                os.system("docker container rm nmap_sql_docker")
+
+
+                    #output.append(nmap_sql_output)
                     continue
 
                 # ------------------------------- Send all outputs to colector ----------------------------------------- #
