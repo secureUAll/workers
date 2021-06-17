@@ -9,6 +9,7 @@ from nikto_converter import *
 from zap_converter import *
 from malware_converter import *
 from nmap_sql_converter import *
+from sqlmap_converter import *
 
 import os 
 import json
@@ -174,7 +175,11 @@ def consume_messages(random_id):
                     os.system("docker container rm nmap_sql_docker")
 
                     nmap_sql_output = nmap_sql_converter("nmap_sql_output.xml")
-                    logging.warning(nmap_sql_output)
+                    #logging.warning(nmap_sql_output)
+
+                    output_sqlmap_json = dict()
+                    output_sqlmap_json["TOOL"] = "sqlmap"
+                    output_sqlmap_json["scan"] = list()
 
                     os.system("docker pull localhost:5000/sqlmap")
 
@@ -183,16 +188,26 @@ def consume_messages(random_id):
                         if len(nmap_sql_output["ports"]) > 0:
 
                             for vuln_link in nmap_sql_output["ports"]["script"]:
-                                logging.warning(vuln_link)
+                                #logging.warning(vuln_link)
                                 # run tool
                                 os.system("docker run --name=\"sql_docker\" --user \"$(id -u):$(id -g)\" --volume=`pwd`:/root/.local/share/sqlmap/output/ -t localhost:5000/sqlmap -u \"" + vuln_link + "\" --dbs")
                                 #copy file to container
                                 os.system("docker cp sql_docker:/root/.local/share/sqlmap/output/ .")
-                                os.system("ls")
+
+                                sqlmap_text = sqlmap_converter(machine + "/log")
+
+                                output_element = dict()
+
+                                output_element[vuln_link] = sqlmap_text
+
+                                output_sqlmap_json["scan"].append(output_element)
+
                                 #os.system("cat nmap_sql_output.xml")
                                 #stop and remove containers
                                 os.system("docker container stop sql_docker")
                                 os.system("docker container rm sql_docker")
+
+                    output.append(output_sqlmap_json)
 
                     # ------------------------------- Normal nmap tool ----------------------------------------- #
 
