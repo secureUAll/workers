@@ -1,5 +1,6 @@
 import json
 import xmltodict
+import logging
 
 def nmap_sql_converter(filename):
 
@@ -9,7 +10,7 @@ def nmap_sql_converter(filename):
 
     data = xmltodict.parse(content)
 
-    #print(json.dumps(data,indent = 2))
+    logging.warning(json.dumps(data,indent = 2))
 
     ##print(data["nmaprun"]["host"]["ports"]["port"]["script"]["@output"].split("\n")[2][4:])
 
@@ -84,6 +85,6 @@ def nmap_sql_converter(filename):
     output_json["TOOL"] = "nmap"
 
 
-    print(json.dumps(output_json, indent = 2))
+    logging.warning(json.dumps(output_json, indent = 2))
     return output_json
 
