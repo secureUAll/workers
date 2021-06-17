@@ -192,11 +192,11 @@ def consume_messages(random_id):
                                 # run tool
                                 os.system("docker run --name=\"sql_docker\" --user \"$(id -u):$(id -g)\" --volume=`pwd`:/root/.local/share/sqlmap/output/ -t localhost:5000/sqlmap -u \"" + vuln_link + "\" --dbs --batch")
                                 #copy file to container
-                                os.system("docker cp sql_docker:/root/.local/share/sqlmap/output/ .")
+                                os.system("docker cp sql_docker:/root/.local/share/sqlmap/output/" + machine + "/log .")
 
-                                os.system("ls")
+                                sqlmap_text = sqlmap_converter("log")
 
-                                sqlmap_text = sqlmap_converter(machine + "/log")
+                                os.system("rm log")
 
                                 output_element = dict()
 
@@ -204,7 +204,6 @@ def consume_messages(random_id):
 
                                 output_sqlmap_json["scan"].append(output_element)
 
-                                #os.system("cat nmap_sql_output.xml")
                                 #stop and remove containers
                                 os.system("docker container stop sql_docker")
                                 os.system("docker container rm sql_docker")
