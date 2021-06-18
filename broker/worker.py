@@ -158,11 +158,12 @@ def consume_messages(random_id):
 #logging.warning(message.value)
 
 def hb_request(message):
-    if message.topic=="HEARTBEAT":
-        if message.value["from"]=="colector":
-            print("VAI ENVIAAAR" + str({'from':WORKER_ID, 'to':"colector"}))
-            producer.send("HEARTBEAT", value={'from':WORKER_ID, 'to':"colector"})
-            producer.flush()
+    for message in consumer:
+        if message.topic=="HEARTBEAT":
+            if message.value["from"]=="colector":
+                print("VAI ENVIAAAR" + str({'from':WORKER_ID, 'to':"colector"}))
+                producer.send("HEARTBEAT", value={'from':WORKER_ID, 'to':"colector"})
+                producer.flush()
 
 
 def scan_request(message):
