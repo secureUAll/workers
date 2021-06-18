@@ -32,7 +32,8 @@ from threading import Thread
 # ------------------------------------------------------------------------------- #
 
 # topics from colector
-colector_topics=['INIT','SCAN_REQUEST','LOG','UPDATE', 'HEARTBEAT']
+colector_topics = ['INIT','SCAN_REQUEST','LOG','UPDATE']
+hb_topics = ['HEARTBEAT']
 
 # golbal variable 
 WORKER_ID = 0
@@ -158,7 +159,7 @@ def consume_messages(random_id):
 #logging.warning(message.value)
 
 def hb_request(message):
-    for message in consumer:
+    for message in consumer_hb:
         if message.topic=="HEARTBEAT":
             if message.value["from"]=="colector":
                 print("VAI ENVIAAAR" + str({'from':WORKER_ID, 'to':"colector"}))
@@ -402,8 +403,24 @@ if __name__ == "__main__":
                             value_deserializer=lambda m: json.loads(m.decode('latin')),
                             fetch_max_wait_ms=0)
 
+    #kafka consumer
+    consumer_hb = KafkaConsumer(bootstrap_servers='kafka:9092',
+                            auto_offset_reset='earliest',
+                            security_protocol='SASL_SSL',
+                            ssl_cafile='./worker_certs/CARoot.pem',
+                            ssl_certfile='./worker_certs/certificate.pem',
+                            ssl_keyfile='./worker_certs/key.pem',
+                            sasl_mechanism='PLAIN',
+                            sasl_plain_username='worker',
+                            sasl_plain_password='worker',
+                            ssl_check_hostname=False,
+                            api_version=(2,7,0),
+                            value_deserializer=lambda m: json.loads(m.decode('latin')),
+                            fetch_max_wait_ms=0)
+
     #subscription to the kafka topics
     consumer.subscribe(colector_topics)
+    consumer_hb.subscribe(hb_topics)
 
     # logs
     logging.warning("worker")
