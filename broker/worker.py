@@ -110,7 +110,7 @@ def consume_messages(random_id):
                 logging.warning(message.value)
                 WORKER_ID = message.value['WORKER_ID']
 
-            hb_thread = Thread(target=hb_request, args=(message,))
+            hb_thread = Thread(target=hb_request)
             hb_thread.start()
 
         # ------------------------------- Update domains topic ----------------------------------------- #
@@ -158,13 +158,32 @@ def consume_messages(random_id):
 #logging.warning(message.topic)
 #logging.warning(message.value)
 
-def hb_request(message):
+def hb_request():
+
+    #kafka consumer
+    consumer_hb = KafkaConsumer(bootstrap_servers='kafka:9092',
+                            auto_offset_reset='earliest',
+                            security_protocol='SASL_SSL',
+                            ssl_cafile='./worker_certs/CARoot.pem',
+                            ssl_certfile='./worker_certs/certificate.pem',
+                            ssl_keyfile='./worker_certs/key.pem',
+                            sasl_mechanism='PLAIN',
+                            sasl_plain_username='worker',
+                            sasl_plain_password='worker',
+                            ssl_check_hostname=False,
+                            api_version=(2,7,0),
+                            value_deserializer=lambda m: json.loads(m.decode('latin')),
+                            fetch_max_wait_ms=0)
+
+    consumer_hb.subscribe(hb_topics)
+
     for message in consumer_hb:
         if message.topic=="HEARTBEAT":
-            if message.value["from"]=="colector":
-                print("VAI ENVIAAAR" + str({'from':WORKER_ID, 'to':"colector"}))
-                producer.send("HEARTBEAT", value={'from':WORKER_ID, 'to':"colector"})
-                producer.flush()
+            if int.from_bytes(message.key,"big") == WORKER_ID:
+                if message.value["from"]=="colector":
+                    print("VAI ENVIAAAR" + str({'from':WORKER_ID, 'to':"colector"}))
+                    producer.send("HEARTBEAT", value={'from':WORKER_ID, 'to':"colector"})
+                    producer.flush()
 
 
 def scan_request(message):
@@ -403,24 +422,9 @@ if __name__ == "__main__":
                             value_deserializer=lambda m: json.loads(m.decode('latin')),
                             fetch_max_wait_ms=0)
 
-    #kafka consumer
-    consumer_hb = KafkaConsumer(bootstrap_servers='kafka:9092',
-                            auto_offset_reset='earliest',
-                            security_protocol='SASL_SSL',
-                            ssl_cafile='./worker_certs/CARoot.pem',
-                            ssl_certfile='./worker_certs/certificate.pem',
-                            ssl_keyfile='./worker_certs/key.pem',
-                            sasl_mechanism='PLAIN',
-                            sasl_plain_username='worker',
-                            sasl_plain_password='worker',
-                            ssl_check_hostname=False,
-                            api_version=(2,7,0),
-                            value_deserializer=lambda m: json.loads(m.decode('latin')),
-                            fetch_max_wait_ms=0)
-
+    
     #subscription to the kafka topics
     consumer.subscribe(colector_topics)
-    consumer_hb.subscribe(hb_topics)
 
     # logs
     logging.warning("worker")
