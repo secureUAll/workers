@@ -82,8 +82,6 @@ def nmap_sql_converter(filename):
     output_json["run_stats"]["host"]["down"] = data["nmaprun"]["runstats"]["hosts"]["@down"] if ("@down" in data["nmaprun"]["runstats"]["hosts"]) else None
     output_json["run_stats"]["host"]["total"] = data["nmaprun"]["runstats"]["hosts"]["@total"] if ("@total" in data["nmaprun"]["runstats"]["hosts"]) else None
 
-    output_json["TOOL"] = "nmap"
-
 
     logging.warning(json.dumps(output_json, indent = 2))
     return output_json
