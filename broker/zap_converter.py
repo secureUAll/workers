@@ -14,7 +14,7 @@ def zap_converter(filename):
     #print(json.dumps(data, indent=2))
 
     output_json["TOOL"] = "zap"
-    output_json["state"] = "up" 
+     
     # ----------------------------------------- adding date -----------------------------------------
     output_json["date"] = data["@generated"] if ("@generated" in data) else None
 
@@ -77,7 +77,10 @@ def zap_converter(filename):
             # add each port to output list
             output_json["ports"].append(output_port)
 
-
+    if output_json["ports"]!=[]:
+        output_json["state"] = "up"
+    else:
+        output_json["state"] = "down"
 
 
 
