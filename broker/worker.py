@@ -179,11 +179,10 @@ def hb_request():
 
     for message in consumer_hb:
         if message.topic=="HEARTBEAT":
-            if int.from_bytes(message.key,"big") == WORKER_ID:
-                if message.value["from"]=="colector":
-                    print("VAI ENVIAAAR" + str({'from':WORKER_ID, 'to':"colector"}))
-                    producer.send("HEARTBEAT", value={'from':WORKER_ID, 'to':"colector"})
-                    producer.flush()
+            if message.value["from"]=="colector":
+                print("VAI ENVIAAAR" + str({'from':WORKER_ID, 'to':"colector"}))
+                producer.send("HEARTBEAT", value={'from':WORKER_ID, 'to':"colector"})
+                producer.flush()
 
 
 def scan_request(message):
