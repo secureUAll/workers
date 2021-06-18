@@ -32,7 +32,7 @@ from threading import Thread
 # ------------------------------------------------------------------------------- #
 
 # topics from colector
-colector_topics=['INIT','SCAN_REQUEST','LOG','UPDATE']
+colector_topics=['INIT','SCAN_REQUEST','LOG','UPDATE', 'HEARTBEAT']
 
 # golbal variable 
 WORKER_ID = 0
