@@ -77,10 +77,10 @@ def zap_converter(filename):
             # add each port to output list
             output_json["ports"].append(output_port)
 
-    if output_json["ports"]!=[]:
-        output_json["state"] = "up"
-    else:
+    if len(output_json["ports"])==0 or (len(output_json["ports"])==1 and output_json["ports"][0]["alerts"]==[]) :
         output_json["state"] = "down"
+    else:
+        output_json["state"] = "up"
 
 
 
