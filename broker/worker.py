@@ -344,28 +344,31 @@ def scan_request(message):
             output_sqlmap_json["TOOL"] = "sqlmap"
             output_sqlmap_json["scan"] = list()
 
-            os.system("docker pull localhost:5000/sqlmap")
-
 
             if "ports" in nmap_sql_output and "script" in nmap_sql_output["ports"]:
                 if len(nmap_sql_output["ports"]) > 0:
 
+                    os.system("docker pull localhost:5000/sqlmap")
+
                     for vuln_link in nmap_sql_output["ports"]["script"]:
+
                         #logging.warning(vuln_link)
                         # run tool
                         os.system("docker run --name=\"sql_docker\" --user \"$(id -u):$(id -g)\" --volume=`pwd`:/root/.local/share/sqlmap/output/ -t localhost:5000/sqlmap -u \"" + vuln_link + "\" --dbs --batch")
                         #copy file to container
                         os.system("docker cp sql_docker:/root/.local/share/sqlmap/output/" + machine + "/log .")
 
-                        sqlmap_text = sqlmap_converter("log")
+                        if os.path.exists("log"):
 
-                        os.system("rm log")
+                            sqlmap_text = sqlmap_converter("log")
 
-                        output_element = dict()
+                            os.system("rm log")
 
-                        output_element[vuln_link] = sqlmap_text
+                            output_element = dict()
 
-                        output_sqlmap_json["scan"].append(output_element)
+                            output_element[vuln_link] = sqlmap_text
+
+                            output_sqlmap_json["scan"].append(output_element)
 
                         #stop and remove containers
                         os.system("docker container stop sql_docker")
