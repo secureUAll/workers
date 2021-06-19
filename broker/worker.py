@@ -236,8 +236,15 @@ def scan_request(message):
 
             os.system("docker container stop certigo_docker")
             os.system("docker container rm certigo_docker")
-            os.system("cat out_certigo.json")
-            certigo_output = certigo_converter("out_certigo.json")
+
+            if os.path.exists("out_certigo.json"):
+                certigo_output = certigo_converter("out_certigo.json")
+            else:
+                certigo_output = dict()
+                certigo_output["TOOL"] = "certigo"
+                certigo_output["state"] = "down"
+
+            output.append(certigo_output)
 
             os.system("rm out_certigo.json")
 
