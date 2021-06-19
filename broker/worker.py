@@ -347,7 +347,7 @@ def scan_request(message):
             os.system("docker pull localhost:5000/sqlmap")
 
 
-            if "script" in nmap_sql_output["ports"]:
+            if "ports" in nmap_sql_output and "script" in nmap_sql_output["ports"]:
                 if len(nmap_sql_output["ports"]) > 0:
 
                     for vuln_link in nmap_sql_output["ports"]["script"]:
