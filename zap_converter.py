@@ -73,7 +73,10 @@ if isinstance(script_list, list):
         # add each port to output list
         output_json["ports"].append(output_port)
 
-
+    if len(output_json["ports"])==0 or (len(output_json["ports"])==1 and output_json["ports"][0]["alerts"]==[]) :
+        output_json["state"] = "down"
+    else:
+        output_json["state"] = "up"
 
 
 
