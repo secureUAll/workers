@@ -1,6 +1,6 @@
+xcoa.av.it.pt
 testphp.vulnweb.com
 atnog-crowdwire1.av.it.pt
-xcoa.av.it.pt
 www.ieeta.pt
 deti-cmd.ua.pt
 api.web.ua.pt
