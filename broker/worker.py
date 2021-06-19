@@ -345,34 +345,35 @@ def scan_request(message):
             output_sqlmap_json["scan"] = list()
 
 
-            if "ports" in nmap_sql_output and "script" in nmap_sql_output["ports"]:
-                if len(nmap_sql_output["ports"]) > 0:
+            if "ports" in nmap_sql_output:
+                if "script" in nmap_sql_output["ports"]:
+                    if len(nmap_sql_output["ports"]) > 0:
 
-                    os.system("docker pull localhost:5000/sqlmap")
+                        os.system("docker pull localhost:5000/sqlmap")
 
-                    for vuln_link in nmap_sql_output["ports"]["script"]:
+                        for vuln_link in nmap_sql_output["ports"]["script"]:
 
-                        #logging.warning(vuln_link)
-                        # run tool
-                        os.system("docker run --name=\"sql_docker\" --user \"$(id -u):$(id -g)\" --volume=`pwd`:/root/.local/share/sqlmap/output/ -t localhost:5000/sqlmap -u \"" + vuln_link + "\" --dbs --batch")
-                        #copy file to container
-                        os.system("docker cp sql_docker:/root/.local/share/sqlmap/output/" + machine + "/log .")
+                            #logging.warning(vuln_link)
+                            # run tool
+                            os.system("docker run --name=\"sql_docker\" --user \"$(id -u):$(id -g)\" --volume=`pwd`:/root/.local/share/sqlmap/output/ -t localhost:5000/sqlmap -u \"" + vuln_link + "\" --dbs --batch")
+                            #copy file to container
+                            os.system("docker cp sql_docker:/root/.local/share/sqlmap/output/" + machine + "/log .")
 
-                        if os.path.exists("log"):
+                            if os.path.exists("log"):
 
-                            sqlmap_text = sqlmap_converter("log")
+                                sqlmap_text = sqlmap_converter("log")
 
-                            os.system("rm log")
+                                os.system("rm log")
 
-                            output_element = dict()
+                                output_element = dict()
 
-                            output_element[vuln_link] = sqlmap_text
+                                output_element[vuln_link] = sqlmap_text
 
-                            output_sqlmap_json["scan"].append(output_element)
+                                output_sqlmap_json["scan"].append(output_element)
 
-                        #stop and remove containers
-                        os.system("docker container stop sql_docker")
-                        os.system("docker container rm sql_docker")
+                            #stop and remove containers
+                            os.system("docker container stop sql_docker")
+                            os.system("docker container rm sql_docker")
 
             output.append(output_sqlmap_json)
 
