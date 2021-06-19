@@ -217,9 +217,24 @@ def scan_request(message):
         os.system("docker container rm nmap_sql_docker")
         os.system("docker container stop sql_docker")
         os.system("docker container rm sql_docker")
+        os.system("docker container stop certigo_docker")
+        os.system("docker container rm certigo_docker")
 
         # level 1
         if scrapping_level >= 1:
+
+            os.system("docker pull localhost:5000/certigo")
+
+            logging.warning("VAI CORRER CERTIGO")
+
+            os.system("docker run --name=\"certigo_docker\" --user \"$(id -u):$(id -g)\" -t localhost:5000/certigo certigo connect --verbose " + machine + " --json > out_certigo.json")
+
+            logging.warning("JA CORRER CERTIGO")
+
+            os.system("docker container stop certigo_docker")
+            os.system("docker container rm certigo_docker")
+
+            
 
             # ------------------------------- Normal nmap tool ----------------------------------------- #
 
