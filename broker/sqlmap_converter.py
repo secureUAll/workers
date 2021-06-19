@@ -15,7 +15,7 @@ def sqlmap_converter(filename):
     for p in query:
         for r in re.findall(r'(?:Type\:)(.*?)\t',p[1]):
             if r in d and p[0] not in d[r]:
-                d[r].add(p[0])
+                d[r].append(p[0])
             else:
                 d[r]=[p[0]]
     return d
