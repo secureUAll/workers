@@ -15,7 +15,7 @@ def nmap_converter(filename):
 
     data = xmltodict.parse(content)
 
-    #print(json.dumps(data,indent = 2))
+    print(json.dumps(data,indent = 2))
 
     output_json = dict()
 
@@ -41,7 +41,9 @@ def nmap_converter(filename):
         output_json["address"]["address_ip"]= data["nmaprun"]["hosthint"]["address"]["@addr"] if ("@addr" in data["nmaprun"]["hosthint"]) else None
         output_json["address"]["address_type"] = data["nmaprun"]["hosthint"]["address"]["@addrtype"] if ("@addrtype" in data["nmaprun"]["hosthint"]) else None
 
-        output_json["address"]["address_name"] = data["nmaprun"]["hosthint"]["hostnames"]["hostname"]["@name"] if ("@name" in data["nmaprun"]["hosthint"]["hostnames"]["hostname"]) else None
+        if "hostnames" in data["nmaprun"]["hosthint"]:
+            if "hostname" in data["nmaprun"]["hosthint"]["hostnames"]:
+                output_json["address"]["address_name"] = data["nmaprun"]["hosthint"]["hostnames"]["hostname"]["@name"] if ("@name" in data["nmaprun"]["hosthint"]["hostnames"]["hostname"]) else None
 
     # ------------------------ adding host ports------------------------- #
     if "host" in data["nmaprun"]:
