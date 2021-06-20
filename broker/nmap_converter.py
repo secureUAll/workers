@@ -42,8 +42,9 @@ def nmap_converter(filename):
         output_json["address"]["address_type"] = data["nmaprun"]["hosthint"]["address"]["@addrtype"] if ("@addrtype" in data["nmaprun"]["hosthint"]) else None
 
         if "hostnames" in data["nmaprun"]["hosthint"]:
-            if "hostname" in data["nmaprun"]["hosthint"]["hostnames"]:
-                output_json["address"]["address_name"] = data["nmaprun"]["hosthint"]["hostnames"]["hostname"]["@name"] if ("@name" in data["nmaprun"]["hosthint"]["hostnames"]["hostname"]) else None
+            if data["nmaprun"]["hosthint"]["hostnames"] != None:
+                if "hostname" in data["nmaprun"]["hosthint"]["hostnames"]:
+                    output_json["address"]["address_name"] = data["nmaprun"]["hosthint"]["hostnames"]["hostname"]["@name"] if ("@name" in data["nmaprun"]["hosthint"]["hostnames"]["hostname"]) else None
 
     # ------------------------ adding host ports------------------------- #
     if "host" in data["nmaprun"]:
