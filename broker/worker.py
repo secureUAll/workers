@@ -339,7 +339,7 @@ def scan_request(message):
             os.system("docker run --name=\"nikto_docker\" --user \"$(id -u):$(id -g)\" --volume=`pwd`:`pwd` --workdir=`pwd` -t localhost:5000/nikto -h " + machine + " -o " + random_filename)
             #copy file to container
             os.system("docker cp nikto_docker:/var/temp/" + random_filename + " .")
-
+            logging.warning("Acabou")
             #stop and remove containers
             os.system("docker container stop nikto_docker")
             os.system("docker container rm nikto_docker")
@@ -347,16 +347,15 @@ def scan_request(message):
             #getting json data from file
             json_nikto = nikto_converter(random_filename)
             output.append(json_nikto)
-            
-            os.system("rm " + random_filename)
+            logging.warning("remover nikto")
+            #os.system("rm " + random_filename)
 
             #producer.send(colector_topics[2], key=bytes([WORKER_ID]), value={"MACHINE":machine, "TOOL": "nikto", "LEVEL": 1, "RESULTS":json_nikto})
             #producer.flush()
 
         # level 4
-        # if scrapping_level >= 4:
-        if scrapping_level < 4:
-
+        if scrapping_level >= 4:
+            logging.warning("ENTROU SQL MAP")
             os.system("docker pull localhost:5000/nmap")
             # run tool
             os.system("docker run --name=\"nmap_sql_docker\" --user \"$(id -u):$(id -g)\" --volume=`pwd`:`pwd` --workdir=`pwd` -t localhost:5000/nmap -sV --script http-sql-injection " + machine + " -p 80 -oX nmap_sql_output.xml")
@@ -376,7 +375,7 @@ def scan_request(message):
 
             if "ports" in nmap_sql_output:
                 if "script" in nmap_sql_output["ports"]:
-                    if len(nmap_sql_output["ports"]) > 0:
+                    if len(nmap_sql_output["ports"]["script"]) > 0:
 
                         os.system("docker pull localhost:5000/sqlmap")
 
@@ -411,7 +410,8 @@ def scan_request(message):
             #continue
 
         # ------------------------------- Send all outputs to colector ----------------------------------------- #
-
+        id= message.value["MACHINE_ID"]
+        logging.info(f"Will send to machine {machine} with id  {id} ")
         producer.send(colector_topics[2], key=bytes([WORKER_ID]), value={"MACHINE":machine, "MACHINE_ID": message.value["MACHINE_ID"], "LEVEL": scrapping_level, "RESULTS":output})
         producer.flush()
 

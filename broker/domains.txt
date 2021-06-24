@@ -1,13 +1,1 @@
-xcoa.av.it.pt
-testphp.vulnweb.com
-atnog-crowdwire1.av.it.pt
-www.ieeta.pt
-deti-cmd.ua.pt
-api.web.ua.pt
-deti-cismob.ua.pt
-srv1-deti.ua.pt
-srv2-deti.ua.pt
-srv3-deti.ua.pt
-srv4-deti.ua.pt
-srv5-deti.ua.pt
-linux3.det.ua.pt
+deti-eel.ua.pt

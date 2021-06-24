@@ -29,7 +29,7 @@ def certigo_converter(filename):
         #logging.warning(json.dumps(data, indent=2))
 
         output_json["TOOL"] = "certigo"
-
+        output_json["state"]="up"
         output_json["scan"] = list()
 
         if "certificates" in data:
