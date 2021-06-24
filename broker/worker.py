@@ -111,8 +111,8 @@ def consume_messages(random_id):
                 logging.warning(message.value)
                 WORKER_ID = message.value['WORKER_ID']
 
-            hb_thread = Thread(target=hb_request)
-            hb_thread.start()
+                hb_thread = Thread(target=hb_request)
+                hb_thread.start()
 
         # ------------------------------- Update domains topic ----------------------------------------- #
 
@@ -142,9 +142,12 @@ def consume_messages(random_id):
         #scan_thread = Thread(target=scan_request, args=(message,))
         #scan_thread.start()
         elif message.topic == colector_topics[1] and int.from_bytes(message.key,"big") == WORKER_ID:
+            
+            logging.warning(f"Received scan request, number of threads active {threading.active_count()}")
+
             while threading.active_count()>5:
                 time.sleep(0.5)
-            scan_request(message)
+
             scan_thread = Thread(target=scan_request, args=(message,))
             scan_thread.start()
           
@@ -200,25 +203,9 @@ def scan_request(message):
     machine = message.value["MACHINE"]
     # get scrapping level
     scrapping_level = int(message.value["SCRAP_LEVEL"])
+    
 
-
-    # removing potential non-stopped containers from previous scan
-    os.system("docker container stop vulscan_docker")
-    os.system("docker container rm vulscan_docker")
-    os.system("docker container stop nmap_docker")
-    os.system("docker container rm nmap_docker")
-    os.system("docker container stop nmap_docker_malware")
-    os.system("docker container rm nmap_docker_malware")
-    os.system("docker container stop zap_docker")
-    os.system("docker container rm zap_docker")
-    os.system("docker container stop nikto_docker")
-    os.system("docker container rm nikto_docker")
-    os.system("docker container stop nmap_sql_docker")
-    os.system("docker container rm nmap_sql_docker")
-    os.system("docker container stop sql_docker")
-    os.system("docker container rm sql_docker")
-    os.system("docker container stop certigo_docker")
-    os.system("docker container rm certigo_docker")
+    id= message.value["MACHINE_ID"]
 
     # level 1
     if scrapping_level >= 1:
@@ -229,12 +216,17 @@ def scan_request(message):
 
         os.system("rm out_certigo.json")
 
-        os.system("docker run --name=\"certigo_docker\" --user \"$(id -u):$(id -g)\" -t localhost:5000/certigo certigo connect --verbose " + machine + " --json > out_certigo.json")
+        container_name=f"certigo_docker{id}"
+
+        os.system(f"docker container stop {container_name}")
+        os.system(f"docker container rm {container_name}")
+
+        os.system(f"docker run --name=\"{container_name}\" --user \"$(id -u):$(id -g)\" -t localhost:5000/certigo certigo connect --verbose " + machine + " --json > out_certigo.json")
 
         logging.warning("JA CORRER CERTIGO")
 
-        os.system("docker container stop certigo_docker")
-        os.system("docker container rm certigo_docker")
+        os.system(f"docker container stop {container_name}")
+        os.system(f"docker container rm {container_name}")
 
         if os.path.exists("out_certigo.json"):
             certigo_output = certigo_converter("out_certigo.json")
@@ -250,29 +242,41 @@ def scan_request(message):
 
 
         # ------------------------------- Normal nmap tool ----------------------------------------- #
+        
+        container_name=f"nmap_docker{id}"
 
         os.system("docker pull localhost:5000/nmap")
+
+        os.system(f"docker container stop {container_name}")
+        os.system(f"docker container rm {container_name}")
+
         # run tool
-        os.system("docker run --name=\"nmap_docker\" --user \"$(id -u):$(id -g)\" --volume=`pwd`:`pwd` --workdir=`pwd` -t localhost:5000/nmap -A -T5 " + machine + " -oX nmap_output.xml")
+        os.system(f"docker run --name=\"{container_name}\" --user \"$(id -u):$(id -g)\" --volume=`pwd`:`pwd` --workdir=`pwd`  -t localhost:5000/nmap -A -T5 " + machine + "--script-timeout 300   -oX nmap_output.xml")
         #copy file to container
-        os.system("docker cp nmap_docker:/var/temp/nmap_output.xml .")
+        os.system(f"docker cp {container_name}:/var/temp/nmap_output.xml .")
         #stop and remove containers
-        os.system("docker container stop nmap_docker")
-        os.system("docker container rm nmap_docker")
+        os.system(f"docker container stop {container_name}")
+        os.system(f"docker container rm {container_name}")
 
         nmap_output = nmap_converter("nmap_output.xml")
         output.append(nmap_output)
 
         # ------------------------------- Scanning for malwares common ports ----------------------------------------- #
+        
+        container_name=f"nmap_docker_malware{id}"
 
         os.system("docker pull localhost:5000/nmap")
         # run tool
-        os.system("docker run --name=\"nmap_docker_malware\" --user \"$(id -u):$(id -g)\" --volume=`pwd`:`pwd` --workdir=`pwd` -t localhost:5000/nmap -p 1080,2283,2535,2745,3127,3128,3410,5554,8866,9898,10000,10080,12345,17300,27374,65506 " + machine + " -oX nmap_malware_output.xml")
+
+        os.system(f"docker container stop {container_name}")
+        os.system(f"docker container rm {container_name}")
+
+        os.system(f"docker run --name=\"{container_name}\" --user \"$(id -u):$(id -g)\" --volume=`pwd`:`pwd` --workdir=`pwd` -t localhost:5000/nmap -p 1080,2283,2535,2745,3127,3128,3410,5554,8866,9898,10000,10080,12345,17300,27374,65506 " + machine + " -oX nmap_malware_output.xml")
         #copy file to container
-        os.system("docker cp nmap_docker_malware:/var/temp/nmap_malware_output.xml .")
+        os.system(f"docker cp {container_name}:/var/temp/nmap_malware_output.xml .")
         #stop and remove containers
-        os.system("docker container stop nmap_docker_malware")
-        os.system("docker container rm nmap_docker_malware")
+        os.system(f"docker container stop {container_name}")
+        os.system(f"docker container rm {container_name}")
 
         malware_output = malware_converter("nmap_malware_output.xml")
 
@@ -284,16 +288,22 @@ def scan_request(message):
     if scrapping_level >= 2:
 
         # ------------------------------- Nmap with vulscan tool ----------------------------------------- #
+        
+        container_name=f"vulscan_docker{id}"
 
         # pull image from registry
         os.system("docker pull localhost:5000/vulscan")
         # runn tool
-        os.system("docker run --name=\"vulscan_docker\" --user \"$(id -u):$(id -g)\" --volume=`pwd`:`pwd` --workdir=`pwd` -t localhost:5000/vulscan:v2 -sV --script=vulscan/vulscan.nse " + machine + " -oX out_vulscan.xml")
+
+        os.system(f"docker container stop {container_name}")
+        os.system(f"docker container rm {container_name}")
+
+        os.system(f"docker run --name=\"{container_name}\" --user \"$(id -u):$(id -g)\" --volume=`pwd`:`pwd` --workdir=`pwd` -t localhost:5000/vulscan:v2 -sV --script-timeout 300 --script=vulscan/vulscan.nse " + machine + " -oX out_vulscan.xml")
         #copy file to container
-        os.system("docker cp vulscan_docker:/var/temp/out_vulscan.xml .")
+        os.system(f"docker cp {container_name}:/var/temp/out_vulscan.xml .")
         #stop and remove containers
-        os.system("docker container stop vulscan_docker")
-        os.system("docker container rm vulscan_docker")
+        os.system(f"docker container stop {container_name}")
+        os.system(f"docker container rm {container_name}")
 
         # convert from xml to json
         output_json = vulscan_converter("out_vulscan.xml")
@@ -304,21 +314,26 @@ def scan_request(message):
         #producer.flush()
 
         # ------------------------------- Zaproxy tool ----------------------------------------- #
+        
+        container_name=f"zap_docker{id}"
 
         os.system("docker pull localhost:5000/zap")
 
+        os.system(f"docker container stop {container_name} ")
+        os.system(f"docker container rm {container_name}")
+
         if machine.find("http://") != -1 or machine.find("https://") != -1:
             logging.warning(machine)
-            os.system("docker run --name=\"zap_docker\" --user \"$(id -u):$(id -g)\" -v $(pwd):/zap/wrk/:rw -t localhost:5000/zap zap-baseline.py -t " + machine + " -J out_zap.json")
+            os.system(f"docker run --name=\"{container_name}\" --user \"$(id -u):$(id -g)\" -v $(pwd):/zap/wrk/:rw -t localhost:5000/zap zap-baseline.py -t " + machine + "  -J out_zap.json")
         else:
             logging.warning("entrou")
             logging.warning("http://" + machine)
-            os.system("docker run --name=\"zap_docker\" --user \"$(id -u):$(id -g)\" -v $(pwd):/zap/wrk/:rw -t localhost:5000/zap zap-baseline.py -t http://" + machine + " -J out_zap.json")
+            os.system(f"docker run --name=\"{container_name}\" --user \"$(id -u):$(id -g)\" -v $(pwd):/zap/wrk/:rw -t localhost:5000/zap zap-baseline.py -t http://" + machine + " -J out_zap.json")
 
-        os.system("docker cp zap_docker:/zap/wrk/out_zap.json .")
+        os.system(f"docker cp {container_name}:/zap/wrk/out_zap.json .")
 
-        os.system("docker container stop zap_docker")
-        os.system("docker container rm zap_docker")
+        os.system(f"docker container stop {container_name}")
+        os.system(f"docker container rm {container_name}")
 
         zap_output = zap_converter("out_zap.json")
 
@@ -330,18 +345,24 @@ def scan_request(message):
     if scrapping_level >= 3:
         # ------------------------------- Nikto tool ----------------------------------------- #
 
+        container_name=f"nikto_docker{id}"
+
         # pull image from registry
         os.system("docker pull localhost:5000/nikto")
+        
+        os.system(f"docker container stop {container_name}")
+        os.system(f"docker container rm {container_name}")
+
         # erase output file
         random_filename = str(random.randint(0, 100000)) + ".json"
         # run tool
-        os.system("docker run --name=\"nikto_docker\" --user \"$(id -u):$(id -g)\" --volume=`pwd`:`pwd` --workdir=`pwd` -t localhost:5000/nikto -h " + machine + " -o " + random_filename)
+        os.system(f"docker run --name=\"{container_name}\" --user \"$(id -u):$(id -g)\" --volume=`pwd`:`pwd` --workdir=`pwd`  -t localhost:5000/nikto -h " + machine + " -timeout 1 -o  " + random_filename)
         #copy file to container
-        os.system("docker cp nikto_docker:/var/temp/" + random_filename + " .")
+        os.system(f"docker cp {container_name}:/var/temp/" + random_filename + " .")
 
         #stop and remove containers
-        os.system("docker container stop nikto_docker")
-        os.system("docker container rm nikto_docker")
+        os.system(f"docker container stop {container_name}")
+        os.system(f"docker container rm {container_name}")
         os.system("ls -l " + random_filename)
         #getting json data from file
         json_nikto = nikto_converter(random_filename)
@@ -349,21 +370,27 @@ def scan_request(message):
         
         os.system("rm " + random_filename)
 
+
         #producer.send(colector_topics[2], key=bytes([WORKER_ID]), value={"MACHINE":machine, "TOOL": "nikto", "LEVEL": 1, "RESULTS":json_nikto})
         #producer.flush()
 
     # level 4
-    # if scrapping_level >= 4:
-    if scrapping_level < 4:
+    if scrapping_level >= 4:
+        
+        container_name=f"nmap_sql_docker{id}"
 
         os.system("docker pull localhost:5000/nmap")
+
+        os.system(f"docker container stop {container_name}")
+        os.system(f"docker container rm {container_name}")
+
         # run tool
-        os.system("docker run --name=\"nmap_sql_docker\" --user \"$(id -u):$(id -g)\" --volume=`pwd`:`pwd` --workdir=`pwd` -t localhost:5000/nmap -sV --script http-sql-injection " + machine + " -p 80 -oX nmap_sql_output.xml")
+        os.system(f"docker run --name=\"{container_name}\" --user \"$(id -u):$(id -g)\" --volume=`pwd`:`pwd` --workdir=`pwd` -t localhost:5000/nmap -sV --script http-sql-injection " + machine + " -p 80 -oX nmap_sql_output.xml")
         #copy file to container
-        os.system("docker cp nmap_sql_docker:/var/temp/nmap_sql_output.xml .")
+        os.system(f"docker cp {container_name}:/var/temp/nmap_sql_output.xml .")
         #stop and remove containers
-        os.system("docker container stop nmap_sql_docker")
-        os.system("docker container rm nmap_sql_docker")
+        os.system(f"docker container stop {container_name}")
+        os.system(f"docker container rm {container_name}")
 
         nmap_sql_output = nmap_sql_converter("nmap_sql_output.xml")
         #logging.warning(nmap_sql_output)
@@ -372,20 +399,26 @@ def scan_request(message):
         output_sqlmap_json["TOOL"] = "sqlmap"
         output_sqlmap_json["scan"] = list()
 
-
         if "ports" in nmap_sql_output:
             if "script" in nmap_sql_output["ports"]:
-                if len(nmap_sql_output["ports"]) > 0:
+                if len(nmap_sql_output["ports"]["script"]) > 0:
+                    
+
 
                     os.system("docker pull localhost:5000/sqlmap")
+                    
+                    container_name = f"sql_docker{id}"
+                    
+                    os.system(f"docker container stop {container_name}")
+                    os.system(f"docker container rm {container_name}")
 
                     for vuln_link in nmap_sql_output["ports"]["script"]:
 
                         #logging.warning(vuln_link)
                         # run tool
-                        os.system("docker run --name=\"sql_docker\" --user \"$(id -u):$(id -g)\" --volume=`pwd`:/root/.local/share/sqlmap/output/ -t localhost:5000/sqlmap -u \"" + vuln_link + "\" --dbs --batch")
+                        os.system(f"docker run --name=\"{container_name}\" --user \"$(id -u):$(id -g)\" --volume=`pwd`:/root/.local/share/sqlmap/output/  -t localhost:5000/sqlmap -u \"" + vuln_link + "\" --dbs --batch --timeout 1 ")
                         #copy file to container
-                        os.system("docker cp sql_docker:/root/.local/share/sqlmap/output/" + machine + "/log .")
+                        os.system(f"docker cp {container_name}:/root/.local/share/sqlmap/output/" + machine + "/log .")
 
                         if os.path.exists("log"):
 
@@ -400,8 +433,8 @@ def scan_request(message):
                             output_sqlmap_json["scan"].append(output_element)
 
                         #stop and remove containers
-                        os.system("docker container stop sql_docker")
-                        os.system("docker container rm sql_docker")
+                        os.system(f"docker container stop {container_name}")
+                        os.system(f"docker container rm {container_name}")
 
         output.append(output_sqlmap_json)
 
@@ -409,10 +442,12 @@ def scan_request(message):
         #output.append(nmap_sql_output)
         #continue
 
-    # ------------------------------- Send all outputs to colector ----------------------------------------- #
 
-    producer.send(colector_topics[2], key=bytes([WORKER_ID]), value={"MACHINE":machine, "MACHINE_ID": message.value["MACHINE_ID"], "LEVEL": scrapping_level, "RESULTS":output})
-    producer.flush()
+        # ------------------------------- Send all outputs to colector ----------------------------------------- #
+        logging.info(f"Will send to machine {machine} with id  {id} ")
+        producer.send(colector_topics[2], key=bytes([WORKER_ID]), value={"MACHINE":machine, "MACHINE_ID": message.value["MACHINE_ID"], "LEVEL": scrapping_level, "RESULTS":output})
+        producer.flush()
+
 
 
 
