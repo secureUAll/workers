@@ -307,6 +307,7 @@ def scan_request(message):
             # ------------------------------- Zaproxy tool ----------------------------------------- #
 
             os.system("docker pull localhost:5000/zap")
+            os.system("rm out_zap.json")
 
             if machine.find("http://") != -1 or machine.find("https://") != -1:
                 logging.warning(machine)
@@ -355,7 +356,7 @@ def scan_request(message):
 
         # level 4
         # if scrapping_level >= 4:
-        if scrapping_level < 4:
+        if scrapping_level >= 4:
 
             os.system("docker pull localhost:5000/nmap")
             # run tool
