@@ -287,19 +287,19 @@ def scan_request(message):
             # ------------------------------- Nmap with vulscan tool ----------------------------------------- #
 
             # pull image from registry
-            os.system("docker pull localhost:5000/vulscan")
+            #os.system("docker pull localhost:5000/vulscan")
             # runn tool
-            os.system("docker run --name=\"vulscan_docker\" --user \"$(id -u):$(id -g)\" --volume=`pwd`:`pwd` --workdir=`pwd` -t localhost:5000/vulscan:v2 -sV --script=vulscan/vulscan.nse " + machine + " -oX out_vulscan.xml")
+            #os.system("docker run --name=\"vulscan_docker\" --user \"$(id -u):$(id -g)\" --volume=`pwd`:`pwd` --workdir=`pwd` -t localhost:5000/vulscan:v2 -sV --script=vulscan/vulscan.nse " + machine + " -oX out_vulscan.xml")
             #copy file to container
-            os.system("docker cp vulscan_docker:/var/temp/out_vulscan.xml .")
+            #os.system("docker cp vulscan_docker:/var/temp/out_vulscan.xml .")
             #stop and remove containers
-            os.system("docker container stop vulscan_docker")
-            os.system("docker container rm vulscan_docker")
+            #os.system("docker container stop vulscan_docker")
+            #os.system("docker container rm vulscan_docker")
 
             # convert from xml to json
-            output_json = vulscan_converter("out_vulscan.xml")
+            #output_json = vulscan_converter("out_vulscan.xml")
 
-            output.append(output_json)
+            #output.append(output_json)
             #logging.warning("vai mandar")
             #producer.send(colector_topics[2], key=bytes([WORKER_ID]), value={"MACHINE":machine, "TOOL": "vulscan", "LEVEL": 2, "RESULTS":output_json})
             #producer.flush()
